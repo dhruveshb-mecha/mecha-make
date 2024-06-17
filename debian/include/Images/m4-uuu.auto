@@ -1,0 +1,23 @@
+SDP: boot -f imx-boot-mecha-comet-m-gen1-sd.bin-flash_evk
+SDPV: delay 1000
+SDPV: write -f imx-boot-mecha-comet-m-gen1-sd.bin-flash_evk -skipspl
+SDPV: jump
+
+#Fatwritte Cortex-M binary
+FB: ucmd setenv fastboot_buffer ${loadaddr}
+FB: download -f hello_world.bin
+FB[-t 20000]: ucmd fatwrite mmc ${emmc_dev}:1 ${fastboot_buffer} hello_world.bin ${fastboot_bytes}
+
+#setting uboot for custom boot configuration
+# FB: ucmd setenv fdtfile _dtb.dtb
+FB: ucmd setenv loadm4image "fatload mmc ${emmc_dev}:1 0x48000000 hello_world.bin; cp.b 0x48000000 0x7e0000 0x20000"
+FB: ucmd setenv m4boot "run loadm4image; bootaux 0x48000000"
+FB: ucmd setenv mmcboot "run m4boot; $mmcboot"
+
+#save env
+FB: ucmd saveenv
+
+FB: ucmd if env exists emmc_ack; then ; else setenv emmc_ack 0; fi;
+FB: ucmd mmc partconf ${emmc_dev} ${emmc_ack} 1 0
+
+FB: done

@@ -1,0 +1,9 @@
+
+uboot-dir: '/home/jack/Desktop/mecha/mecha-make/BUILD/uboot'
+build-dir: '/home/jack/Desktop/mecha/mecha-make/BUILD/build'
+uboot_repo: "https://github.com/chiragp-mecha/u-boot"
+imx_atf_repo: "https://github.com/nxp-imx/imx-atf"
+imx_mkimage_repo: "https://github.com/nxp-imx/imx-mkimage"
+firmware_url: "https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/firmware-imx-8.20.bin"
+arch: "arm64"
+cross_compile: "/usr/bin/aarch64-linux-gnu-"

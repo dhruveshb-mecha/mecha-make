@@ -1,0 +1,15 @@
+[Unit]
+Description=USB1 Switch to usb-host
+
+[Service]
+Type=oneshot
+User=root
+RemainAfterExit=no
+ExecStart=/bin/bash -c '/bin/echo 0 > /sys/bus/usb/devices/usb1/power/autosuspend_delay_ms'
+ExecStart=/bin/bash -c '/bin/echo auto > /sys/bus/usb/devices/usb1/power/control'
+ExecStart=/bin/bash -c '/bin/echo host > /sys/class/udc/ci_hdrc.0/device/role'
+ExecStart=/bin/bash -c '/bin/echo on > /sys/bus/usb/devices/usb1/power/control'
+#TimeoutStartSec=0
+
+[Install]
+WantedBy=default.target

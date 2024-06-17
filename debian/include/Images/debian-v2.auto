@@ -1,0 +1,99 @@
+uuu_version 1.2.39
+
+# This command will be run when i.MX6/7 i.MX8MM, i.MX8MQ
+# SDP: boot -f _flash.bin
+SDP: boot -f imx-boot-mecha-comet-m-gen1-sd.bin-flash_evk
+
+# This command will be run when ROM support stream mode i.MX8QXP, i.MX8QM
+# SDPS: boot -f _flash.bin
+
+
+# These commands will be run when use SPL and will be skipped if no spl
+# if (SPL support SDPV)
+# {
+SDPV: delay 1000
+SDPV: write -f imx-boot-mecha-comet-m-gen1-sd.bin-flash_evk -skipspl
+SDPV: jump
+# }
+
+FB: ucmd setenv fastboot_buffer ${loadaddr}
+FB: download -f Image 
+FB: ucmd setenv fastboot_buffer ${fdt_addr}
+
+#FB: download -f comet-fs/imx8mm-mecha-comet-m-gen1.dtb
+
+FB: download -f imx8mm-mecha-som-gen1-ramfs.dtb
+FB: ucmd setenv fdtfile imx8mm-mecha-som-gen1-ramfs.dtb
+FB: ucmd printenv fdtfile 
+FB: ucmd setenv fastboot_buffer ${initrd_addr}
+
+# Download ramfs image to RAM
+FB: download -f mecha-image-mfgtool-initramfs-mecha-comet-m-gen1-20240306061946.rootfs.cpio.gz.u-boot
+
+FB: ucmd setenv mfgtool_args ${mfgtool_args} mfg_mmcdev=${emmc_dev}
+FB: ucmd run mfgtool_args
+FB: ucmd setenv bootargs root=/dev/ram0 rdinit=/linuxrc rw
+FB: ucmd printenv fdtfile
+FB: acmd booti ${loadaddr} ${initrd_addr} ${fdt_addr}
+
+FBK: ucmd sleep 3
+
+# get mmc dev number from kernel command line
+FBK: ucmd cmdline=`cat /proc/cmdline`;cmdline=${cmdline#*mfg_mmcdev=};cmds=($cmdline);echo ${cmds[0]}>/tmp/mmcdev
+FBK: ucmd sleep 1
+
+# Wait for mmc
+FBK: ucmd mmc=`cat /tmp/mmcdev`; while [ ! -e /dev/mmcblk2 ]; do sleep 1; echo "wait for /dev/mmcblk2 appear"; done;
+FBK: ucmd sleep 1
+
+### Clear all Partitions 
+FBK: ucmd sfdisk -f --delete /dev/mmcblk2
+
+
+FBK: ucmd lsblk
+
+
+# FAT16 BOOT partition
+FBK: ucmd parted /dev/mmcblk2 -- mkpart primary FAT16 1MB 200MB
+FBK: ucmd mkfs.vfat /dev/mmcblk2p1
+
+FBK: ucmd parted /dev/mmcblk2 -- mkpart primary ext4 205MB 10000MB
+FBK: ucmd mkfs.ext4 /dev/mmcblk2p2
+
+FBK: ucmd parted /dev/mmcblk2 -- mkpart primary ext4 10005MB 29000MB
+FBK: ucmd mkfs.ext4 /dev/mmcblk2p3
+
+
+# ROOT PARTITION ----------------------------
+FBK: ucmd mmc=`cat /tmp/mmcdev`; mkdir -p /mnt
+FBK: ucmd mmc=`cat /tmp/mmcdev`; mount -t ext4 /dev/mmcblk2p2 /mnt
+
+
+# BOOT PARTITION --------------------------
+FBK: ucmd mmc=`cat /tmp/mmcdev`; mkdir -p /mnt/boot
+FBK: ucmd mmc=`cat /tmp/mmcdev`; mount -t vfat /dev/mmcblk2p1 /mnt/boot
+
+
+# HOME PARTITION ---------------------------
+FBK: ucmd mmc=`cat /tmp/mmcdev`; mkdir -p /mnt/home
+FBK: ucmd mmc=`cat /tmp/mmcdev`; mount -t ext4 /dev/mmcblk2p3 /mnt/home
+
+
+
+# Extract _rootfs.tar.bz2
+FBK: acmd export EXTRACT_UNSAFE_SYMLINKS=1; tar -z -x -C /mnt
+
+# Download image-core to root partition
+FBK: ucp debian-image-rootfs.tar.gz t:- /mnt
+
+# Create symlink to kernel image (TODO: replace with full kernel name in args)
+FBK: ucmd cp /mnt/boot/Image* /mnt/boot/Image
+
+FBK: ucmd sync
+FBK: DONE
+
+
+
+
+
+
