@@ -1,6 +1,6 @@
 
-uboot-dir: '/home/jack/Desktop/mecha/mecha-make/BUILD/uboot'
-build-dir: '/home/jack/Desktop/mecha/mecha-make/BUILD/build'
+uboot-dir: '/mecha-make/BUILD/uboot'
+build-dir: 'mecha-make/BUILD/build'
 uboot_repo: "https://github.com/chiragp-mecha/u-boot"
 imx_atf_repo: "https://github.com/nxp-imx/imx-atf"
 imx_mkimage_repo: "https://github.com/nxp-imx/imx-mkimage"
