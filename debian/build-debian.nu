@@ -61,63 +61,63 @@ def main [machine: string, build_dir: string] {
 
   # TODO: handle return code handling, create a stages runner
 
-  # # Stage1: Setup rootfs
-  # install_host_packages
-  # debootstrap
-  # copy_qemu_arm_static
-  # make_root_home_dir
+  # Stage1: Setup rootfs
+  install_host_packages
+  debootstrap
+  copy_qemu_arm_static
+  make_root_home_dir
 
-  # # Stage2: Add packages
-  # mount_sys_proc_volumes
+  # Stage2: Add packages
+  mount_sys_proc_volumes
 
-  # log_info "Installing target packages"
-  # install_target_packages
+  log_info "Installing target packages"
+  install_target_packages
 
-  # # Stage3: Configure rootfs
-  # log_info "setting up rootfs:"
-  # # set_hostname
-  # # setup_default_locale_timezone
+  # Stage3: Configure rootfs
+  log_info "setting up rootfs:"
+  # set_hostname
+  # setup_default_locale_timezone
 
 
 
-  # # copy_linux_kernel_dtb_modules
-  # copy_linux_kernel_dtb_modules $rootfs_dir $PACKAGE_CONF_PATH
+  # copy_linux_kernel_dtb_modules
+  copy_linux_kernel_dtb_modules $rootfs_dir $PACKAGE_CONF_PATH
 
-  # # copy_misc
   # copy_misc
+  copy_misc
   
 
-  # # configure_audio
-  # configure_audio $rootfs_dir $PACKAGE_CONF_PATH
+  # configure_audio
+  configure_audio $rootfs_dir $PACKAGE_CONF_PATH
 
-  # # update_os_release
-  # update_os_release $rootfs_dir $PACKAGE_CONF_PATH
+  # update_os_release
+  update_os_release $rootfs_dir $PACKAGE_CONF_PATH
 
-  # # configure_udev
-  # configure_udev $rootfs_dir $PACKAGE_CONF_PATH
+  # configure_udev
+  configure_udev $rootfs_dir $PACKAGE_CONF_PATH
 
-  # # configure_networking
-  # configure_networking $rootfs_dir
+  # configure_networking
+  configure_networking $rootfs_dir
 
 
-  # # enable_easysplash
-  # enable_easysplash $rootfs_dir 
-  # # enable_boot_fw
+  # enable_easysplash
+  enable_easysplash $rootfs_dir 
+  # enable_boot_fw
 
-  # # configure_bluetooth
-  # configure_bluetooth $rootfs_dir $PACKAGE_CONF_PATH
+  # configure_bluetooth
+  configure_bluetooth $rootfs_dir $PACKAGE_CONF_PATH
 
-  # # configure_ssh
-  # configure_ssh $rootfs_dir $PACKAGE_CONF_PATH
+  # configure_ssh
+  configure_ssh $rootfs_dir $PACKAGE_CONF_PATH
 
-  # # configure_default_user
-  # configure_default_user $rootfs_dir $PACKAGE_CONF_PATH
+  # configure_default_user
+  configure_default_user $rootfs_dir $PACKAGE_CONF_PATH
 
-  # # configure_greeter
-  # configure_greeter $rootfs_dir
+  # configure_greeter
+  configure_greeter $rootfs_dir
 
-  # # configure_sys_files
-  # configure_sys_files $rootfs_dir $PACKAGE_CONF_PATH
+  # configure_sys_files
+  configure_sys_files $rootfs_dir $PACKAGE_CONF_PATH
 
 
 
