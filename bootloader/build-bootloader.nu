@@ -3,20 +3,25 @@
 use modules/logger.nu *
 use modules/utils.nu *
 use modules/uboot-build.nu *
+use modules/imx-firmware.nu *
 
 # Global variables
 const ARCH = "arm64"
 const CROSS_COMPILE = "/usr/bin/aarch64-linux-gnu-"
 
 # Entry point
-def main [uboot_dir:string, build_dir:string] {
+def main [build_dir:string] {
     log_info "Starting build script"
 
-    let u_boot_dir = $uboot_dir
+    # convert build_dir to absolute path
+    let build_dir = $build_dir | path expand
+
+    # let u_boot_dir = $uboot_dir
     let work_dir = $build_dir +  "/work";
+    let u_boot_dir = $work_dir + "/u-boot";
     let deploy_dir = $build_dir + "/deploy";
     
-    log_info "Checking for necessary directories"
+    log_debug "Checking for necessary directories"
     create_dir_if_not_exist $work_dir
     create_dir_if_not_exist $deploy_dir
     create_dir_if_not_exist $u_boot_dir
@@ -53,16 +58,14 @@ def main [uboot_dir:string, build_dir:string] {
 }
 
 
-
-
 def copy_files [] {
-    echo "Copying necessary files to IMX MKIMAGE directory"
+    log_info "Copying necessary files to IMX MKIMAGE directory"
     let uboot_dir = $env.UBOOT_DIR
     let work_dir = $env.WORK_DIR
 
     # log working directory and uboot directory
-    log_info $"U-Boot directory: ($uboot_dir)"
-    log_info $"Work directory: ($work_dir)"
+    log_debug $"U-Boot directory: ($uboot_dir)"
+    log_debug $"Work directory: ($work_dir)"
 
     let mkimage_dir = ($work_dir | path join "imx-mkimage" "iMX8M")
     cp ($uboot_dir | path join "spl" "u-boot-spl.bin") $mkimage_dir
@@ -73,7 +76,7 @@ def copy_files [] {
 
 
     let synopsys_dir = ($work_dir | path join "firmware-imx" "firmware-imx-8.20" "firmware" "ddr" "synopsys")
-    log_info ($"Synopsys directory: ($synopsys_dir)")
+    log_debug ($"Synopsys directory: ($synopsys_dir)")
     let pattern = ($synopsys_dir | path join "lpddr4_pmu_train_*")
     glob $pattern | each { |file| cp $file $mkimage_dir }
 
