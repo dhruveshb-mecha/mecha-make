@@ -87,6 +87,7 @@ def copy_files [] {
 def build_image [] {
     log_info "Building final image"
     let work_dir = $env.WORK_DIR
+    log_debug $"Work directory: ($work_dir)"
     cd ($work_dir | path join "imx-mkimage" )
     make SOC=iMX8MM PLAT=mecha-comet flash_evk
     log_info "Image build completed successfully"
