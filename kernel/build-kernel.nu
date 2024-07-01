@@ -41,7 +41,7 @@ def main [build_dir: string] {
   }
 
     # check_and_install_dependencies
-    # build_kernel
+    build_kernel
 
     # build debians for kernel modules
     build_debians
