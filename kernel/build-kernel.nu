@@ -16,9 +16,12 @@ let debian_frontend = "noninteractive"
 # Entry point
 def main [build_dir: string] {
 
-    log_info "Starting kernel build script"
+  log_info "Starting kernel build script"
 
-    #  get absolute path
+  # check_and_install_dependencies
+  check_and_install_dependencies
+
+  #  get absolute path
   let build_dir = $build_dir | path expand
 
   log_debug $build_dir
@@ -39,6 +42,9 @@ def main [build_dir: string] {
     CROSS_COMPILE: $cross_compile,
     DEBIAN_FRONTEND : $debian_frontend
   }
+
+
+    
 
     # check_and_install_dependencies
     build_kernel
