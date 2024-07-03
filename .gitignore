@@ -1,3 +1,4 @@
 /temp
 /BUILD
+/build*
 debian/include

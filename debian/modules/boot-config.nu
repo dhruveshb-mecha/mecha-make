@@ -7,8 +7,6 @@ export def enable_easysplash [rootfs_dir: string] {
 
   log_info "Enabling easysplash service:"
 
-
-
   alias CHROOT = sudo chroot $rootfs_dir
   alias SUDO = sudo
   CHROOT systemctl enable easysplash-start.service

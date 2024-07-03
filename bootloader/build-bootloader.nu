@@ -3,7 +3,9 @@
 use modules/logger.nu *
 use modules/utils.nu *
 use modules/uboot-build.nu *
+use modules/arm-trusted-firmwware.nu *
 use modules/imx-firmware.nu *
+use modules/imx-mkimage.nu *
 
 # Global variables
 const ARCH = "arm64"
@@ -24,7 +26,7 @@ def main [build_dir:string] {
     log_debug "Checking for necessary directories"
     create_dir_if_not_exist $work_dir
     create_dir_if_not_exist $deploy_dir
-    create_dir_if_not_exist $u_boot_dir
+#    create_dir_if_not_exist $u_boot_dir
 
     load-env {
         ARCH: $ARCH
@@ -35,10 +37,10 @@ def main [build_dir:string] {
     }
 
     log_info "Building U-Boot"
-    build_uboot $u_boot_dir
+    #  build_uboot $u_boot_dir
 
     # building imx trusted firmware
-    build_imx_trusted_firmware $work_dir
+    #  build_imx_trusted_firmware $work_dir
 
     # download and extract firmware
     download_firmware $work_dir

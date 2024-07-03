@@ -28,5 +28,5 @@ os-release:
   HOME_URL: "https://mecha.so/"
   SUPPORT_URL: "https://forum.mecha.so/"
   BUG_REPORT_URL: "https://forum.mecha.so/"
-packages-path: /home/jack/Desktop/mecha/mecha-make/temp/build-debian/include/packages
-scripts-path: /home/jack/Desktop/mecha/mecha-make/temp/build-debian/include/scripts
+packages-path: ./include/packages
+scripts-path: ./include/scripts

@@ -62,72 +62,35 @@ def main [machine: string, build_dir: string] {
   # TODO: handle return code handling, create a stages runner
 
   # Stage1: Setup rootfs
-  install_host_packages
-  debootstrap
-  copy_qemu_arm_static
-  make_root_home_dir
-
-  # Stage2: Add packages
-  mount_sys_proc_volumes
-
-  log_info "Installing target packages"
-  install_target_packages
-
-  # Stage3: Configure rootfs
-  log_info "setting up rootfs:"
-  # set_hostname
-  # setup_default_locale_timezone
-
-
-
-  # copy_linux_kernel_dtb_modules
-  copy_linux_kernel_dtb_modules $rootfs_dir $PACKAGE_CONF_PATH
-
-  # copy_misc
-  copy_misc
+  # install_host_packages
+  # debootstrap
+  # copy_qemu_arm_static
+  # make_root_home_dir
+  # mount_sys_proc_volumes
+  # install_linux_firmware_packages
+  # install_linux_kernel_packages
+  # install_target_packages
+  # log_info "setting up rootfs:"
   
-
-  # configure_audio
-  configure_audio $rootfs_dir $PACKAGE_CONF_PATH
-
-  # update_os_release
-  update_os_release $rootfs_dir $PACKAGE_CONF_PATH
-
-  # configure_udev
-  configure_udev $rootfs_dir $PACKAGE_CONF_PATH
-
-  # configure_networking
-  configure_networking $rootfs_dir
-
-
-  # enable_easysplash
-  enable_easysplash $rootfs_dir 
-  # enable_boot_fw
-
-  # configure_bluetooth
-  configure_bluetooth $rootfs_dir $PACKAGE_CONF_PATH
-
-  # configure_ssh
-  configure_ssh $rootfs_dir $PACKAGE_CONF_PATH
-
-  # configure_default_user
-  configure_default_user $rootfs_dir $PACKAGE_CONF_PATH
-
-  # configure_greeter
-  configure_greeter $rootfs_dir
-
-  # configure_sys_files
-  configure_sys_files $rootfs_dir $PACKAGE_CONF_PATH
-
-
-
-  # Pack rootfs
-  pack_root_fs $rootfs_dir $deploy_dir
-
-  # Stage4: Cleanup
+  # set_hostname # disabled
+  # setup_default_locale_timezone # disabled
+  # copy_linux_kernel_dtb_modules # disabled
+  # copy_linux_kernel_dtb_modules $rootfs_dir $PACKAGE_CONF_PATH # disabled
+  
+  # copy_misc
+  # configure_audio $rootfs_dir $PACKAGE_CONF_PATH
+  # update_os_release $rootfs_dir $PACKAGE_CONF_PATH
+  # configure_udev $rootfs_dir $PACKAGE_CONF_PATH
+  # configure_networking $rootfs_dir
+  # enable_easysplash $rootfs_dir # disabled
+  # enable_boot_fw # disabled
+  # configure_bluetooth $rootfs_dir $PACKAGE_CONF_PATH
+  # configure_ssh $rootfs_dir $PACKAGE_CONF_PATH
+  # configure_default_user $rootfs_dir $PACKAGE_CONF_PATH
+  # configure_greeter $rootfs_dir
+  # configure_sys_files $rootfs_dir $PACKAGE_CONF_PATH
   unmount_sys_proc_volumes
-
-
+  pack_root_fs $rootfs_dir $deploy_dir
 }
 
 def debootstrap [] {
@@ -157,11 +120,11 @@ def copy_qemu_arm_static [] {
   let rootfs_dir = $env.ROOTFS_DIR
 
   # Check if `debootstrap` is installed
-  let is_qemu_arm_static_installed = dpkg -l | grep qemu-arm-static | wc -l | into int
+  let is_qemu_arm_static_installed = dpkg -l | grep qemu-user-static | wc -l | into int
 
   # TODO: instead of checking with dpkg we can check with binary
   if $is_qemu_arm_static_installed == 0 {
-    log_error "`qemu-arm-static` is not installed, cannot continue further"
+    log_error "`qemu-user-static` is not installed, cannot continue further"
     return
   }
 
