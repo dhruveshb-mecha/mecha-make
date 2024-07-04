@@ -3,7 +3,9 @@
 use modules/logger.nu *
 use modules/utils.nu *
 use modules/uboot-build.nu *
-use modules/imx-firmware.nu *
+use modules/download-imx-firmware.nu *
+use modules/arm-trusted-firmware.nu *
+use modules/imx-mkimage.nu * 
 
 # Global variables
 const ARCH = "arm64"
