@@ -35,3 +35,25 @@ BUG_REPORT_URL="($os_info.BUG_REPORT_URL)"
   sudo mv $temp_file $os_release_info_path
 
 }
+
+export def oem_images [rootfs_dir: string, package_conf_path: string] {
+  log_info "Setting OEM logo:"
+
+
+
+  let media_files_location =  (open $package_conf_path | get media-files)
+  logger log_debug $"Script Directory Path: ($media_files_location)"
+
+  let oem_logo_src = $media_files_location + "/oem-logo.png"
+  let oem_logo_dest = $media_files_location + "/usr/share/plymouth/themes/default/oem-logo.png"
+
+  let splash_image_dest = $rootfs_dir + "/boot/splash/"
+  sudo mkdir -p $splash_image_dest
+
+
+  let pattern = ($splash_image_dest | path join "*.bmp")
+  glob $pattern | each { |file| cp $file $splash_image_dest }
+
+
+  log_debug "Setting OEM logo Successfully."
+}

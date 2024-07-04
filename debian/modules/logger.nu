@@ -11,3 +11,7 @@ export def log_debug [message: string] {
 export def log_error [message: string] {
   print $"(ansi red)\(ERROR\): ($message)(ansi reset)"
 }
+
+export def log_warn [message: string] {
+  print $"(ansi purple)\(WARN\): ($message)(ansi reset)"
+}
