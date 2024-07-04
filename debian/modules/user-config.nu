@@ -16,7 +16,11 @@ export def configure_default_user [rootfs_dir: string, package_conf_path: string
   let user_password = $user_data.password
 
   log_debug $"Creating user: ($user_name)"
-  CHROOT useradd -m -u 1001 -p '\$5\$11223344\$Qi1UvJ46XO2CCaKoCyuMjV4cPu7YWZYWoSJpu3gdGsD' $user_name
+  
+  let salt = random chars --length 10
+  let passwd_hash = mkpasswd -m sha-512 $user_password -s $salt
+
+  CHROOT useradd -m -u 1001 -p $passwd_hash $user_name
 
   let user_home_dir = "/home/" + $user_name
 
@@ -48,5 +52,4 @@ export def configure_default_user [rootfs_dir: string, package_conf_path: string
   CHROOT usermod -aG render $user_name
   CHROOT usermod -aG netdev $user_name
   CHROOT chsh -s /bin/bash $user_name
-
 }
