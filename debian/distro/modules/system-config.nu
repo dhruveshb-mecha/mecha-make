@@ -299,6 +299,33 @@ export def set_config_dir_ownership [] {
     }
 }
 
+export def set_alacritty_config_dir_ownership [] {
+    let themes_dir = $"/home/mecha/.alacritty-theme"
+    log_debug $"Setting ownership of ($themes_dir) to mecha:mecha"
+    try {
+    SUDO chown -R mecha:mecha $themes_dir
+    log_info "Ownership set successfully."
+    } catch {
+     |error| log_error $"Failed to set ownership : ($error)"
+    }
+
+    # set permissions to 700
+    try {
+    SUDO chmod 700 $themes_dir
+    log_info "Permissions set successfully."
+    } catch {
+     |error| log_error $"Failed to set permissions : ($error)"
+    }
+
+    # migrate alacritty
+    try {
+    alacritty migrate
+    log_info "Permissions set successfully."
+    } catch {
+     |error| log_error $"Failed to set permissions : ($error)"
+    }
+}
+
 export def configure_mecha_system_pref [] {
     log_info "Configuring system settings:"
     let rootfs_dir = $env.ROOTFS_DIR
