@@ -75,7 +75,7 @@ export def configure_alacritty [] {
 Type=Application
 TryExec=alacritty
 Exec=alacritty
-Icon=Alacritty
+Icon=/usr/share/mechanix/shell/launcher/assets/icons/app_drawer/terminal_icon.png
 Terminal=false
 Categories=System;TerminalEmulator;
 
