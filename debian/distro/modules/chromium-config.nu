@@ -93,31 +93,36 @@ export def configure_chromium_preferences [] {
 
 
     # Create chromium.desktop file
-    let desktop_file_path = "/usr/share/applications/chromium.desktop"
-    let desktop_file_dir = "/usr/share/applications"
+    let desktop_file_path = $rootfs_dir + "/usr/share/applications/chromium.desktop"
+    let desktop_file_dir = $rootfs_dir + "/usr/share/applications"
 
-    if not ($desktop_file_dir | path exists) {
-        log_debug $"Creating directory: ($desktop_file_dir)"
-        SUDO mkdir -p $desktop_file_dir
+    # Remove existing file if it exists
+    if ($desktop_file_path | path exists) {
+        log_debug $"Removing existing desktop file: ($desktop_file_path)"
+        SUDO rm $desktop_file_path
     }
 
-    let desktop_file_content = '
-    [Desktop Entry]
-    Type=Application
-    TryExec=chromium
-    Exec=sh -c "export DISPLAY=:0 && chromium"
-    Icon=/usr/share/mechanix/shell/launcher/assets/icons/app_drawer/chromium_icon.png
-    Terminal=false
-    Categories=System;
-
-    Name=Chromium
-    GenericName=Chromium
-    Comment=Browser app
+    let desktop_file_content = '[Desktop Entry]
+Type=Application
+TryExec=chromium
+Exec=sh -c "export DISPLAY=:0 && chromium"
+Icon=/usr/share/mechanix/shell/launcher/assets/icons/app_drawer/chromium_icon.png
+Terminal=false
+Categories=System;
+Name=Chromium
+GenericName=Chromium
+Comment=Browser app
     '
 
+    # Create desktop entry file
     log_debug $"Writing desktop file to: ($desktop_file_path)"
-    echo $desktop_file_content | SUDO tee $desktop_file_path
+    # Create empty file with sudo
+    SUDO touch $desktop_file_path
+    # Write the content
+    echo $desktop_file_content | SUDO tee $desktop_file_path out> /dev/null
+    # Set appropriate permissions
     SUDO chmod 644 $desktop_file_path
+    log_debug "Desktop entry created successfully."
 
     
     log_info "Chromium configuration completed."

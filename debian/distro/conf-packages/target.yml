@@ -36,7 +36,7 @@ package_groups:
       - dosfstools
       - cpufrequtils
       - upower
-      - libglib2.0-0-dbg
+      - libglib2.0-0
   - name: network
     packages:
       - bluez

@@ -111,6 +111,8 @@ def main [machine: string, build_dir: string] {
 
     configure_mecha_system_pref
 
+    configure_mecha_connect_desktop_file
+
     set_config_dir_ownership
 
     unmount_sys_proc_volumes
