@@ -115,5 +115,13 @@ Exec=alacritty
      |error| log_error $"Failed to set permissions : ($error)"
     }
 
+     # migrate alacritty
+    try {
+    alacritty migrate
+    log_info "Alacritty migrated."
+    } catch {
+     |error| log_error $"Failed to migrate : ($error)"
+    }
+
     log_debug "Alacritty configuration completed successfully."
 }
