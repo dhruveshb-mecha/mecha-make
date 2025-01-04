@@ -99,29 +99,6 @@ Exec=alacritty
     SUDO chmod 644 $desktop_file_path
     log_debug "Desktop entry created successfully."
 
-    let themes_dir = $"/home/mecha/.alacritty-theme"
-    try {
-    SUDO chown -R mecha:mecha $themes_dir
-    log_info "Ownership set successfully."
-    } catch {
-     |error| log_error $"Failed to set ownership : ($error)"
-    }
-
-    # set permissions to 700
-    try {
-    SUDO chmod 700 $themes_dir
-    log_info "Permissions set successfully."
-    } catch {
-     |error| log_error $"Failed to set permissions : ($error)"
-    }
-
-     # migrate alacritty
-    try {
-    alacritty migrate
-    log_info "Alacritty migrated."
-    } catch {
-     |error| log_error $"Failed to migrate : ($error)"
-    }
 
     log_debug "Alacritty configuration completed successfully."
 }
