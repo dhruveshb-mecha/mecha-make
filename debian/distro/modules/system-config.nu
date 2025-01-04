@@ -300,10 +300,17 @@ export def set_config_dir_ownership [] {
 }
 
 export def set_alacritty_config_dir_ownership [] {
-    let themes_dir = $"/home/mecha/.alacritty-theme"
+		let themes_dir = $"/home/mecha/.alacritty-theme"
+    log_debug $"Setting ownership of ($themes_dir) to mecha:mecha"
+    
+    let rootfs_dir = $env.ROOTFS_DIR
+
+     # Use chroot to execute gsettings command
+    alias CHROOT = sudo chroot $rootfs_dir
+    
     log_debug $"Setting ownership of ($themes_dir) to mecha:mecha"
     try {
-    SUDO chown -R mecha:mecha $themes_dir
+    CHROOT chown -R mecha:mecha $themes_dir
     log_info "Ownership set successfully."
     } catch {
      |error| log_error $"Failed to set ownership : ($error)"
@@ -311,7 +318,7 @@ export def set_alacritty_config_dir_ownership [] {
 
     # set permissions to 700
     try {
-    SUDO chmod 700 $themes_dir
+    CHROOT chmod 700 $themes_dir
     log_info "Permissions set successfully."
     } catch {
      |error| log_error $"Failed to set permissions : ($error)"
@@ -319,7 +326,7 @@ export def set_alacritty_config_dir_ownership [] {
 
     # migrate alacritty
     try {
-    alacritty migrate
+    /usr/bin/alacritty migrate
     log_info "Permissions set successfully."
     } catch {
      |error| log_error $"Failed to set permissions : ($error)"
