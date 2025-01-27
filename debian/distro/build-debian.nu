@@ -85,7 +85,7 @@ def main [machine: string, build_dir: string] {
     
     configure_audio 
     
-    update_os_release 
+    #update_os_release 
     
     configure_udev
     
