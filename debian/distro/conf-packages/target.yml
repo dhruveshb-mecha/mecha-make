@@ -19,14 +19,9 @@ package_groups:
       - u-boot-tools
   - name: linux
     packages:
-      # use this for rev 3
-      - linux-image-6.1.22+mecha
-      - linux-headers-6.1.22+mecha
-      - linux-libc-dev=6.1.22+mecha-1
-      # use this for rev 5 ingore the above 
-      # - linux-image-6.6.36+mecha+
-      # - linux-headers-6.6.36+mecha+
-      # - linux-libc-dev=6.6.36-g2cf9194da72b-1
+      - linux-image-6.6.36+mecha+
+      - linux-headers-6.6.36+mecha+
+      - linux-libc-dev=6.6.36-g2cf9194da72b-1
 
   - name: system
     packages:
