@@ -15,6 +15,7 @@ use modules/clean-up.nu *
 use modules/debootstrap.nu *
 use modules/chromium-config.nu *
 use modules/alacritty-config.nu *
+use modules/rev3-config.nu *
 
 
 const BUILD_CONF_PATH = "./conf/build.yml" 
@@ -98,6 +99,8 @@ def main [machine: string, build_dir: string] {
     configure_default_user
     
     configure_greeter
+
+    configure_rev3
     
     configure_mechanix_system_dbus 
 
