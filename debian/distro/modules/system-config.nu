@@ -276,7 +276,7 @@ mechanix-keyboard -s /etc/mechanix/shell/keyboard/settings.yml &"
 }
 
 export def set_config_dir_ownership [] {
-    let config_dir = $"($env.ROOTFS_DIR)/home/mecha/.config"
+    let config_dir = $"/home/mecha/.config"
     log_debug $"Setting ownership of ($config_dir) to mecha:mecha"
     
     let rootfs_dir = $env.ROOTFS_DIR
@@ -287,7 +287,49 @@ export def set_config_dir_ownership [] {
     CHROOT chown -R mecha:mecha $config_dir
     log_info "Ownership set successfully."
     } catch {
-      log_error $"Failed to set ownership"
+     |error| log_error $"Failed to set ownership : ($error)"
+    }
+
+    # set permissions to 700
+    try {
+    CHROOT chmod 700 $config_dir
+    log_info "Permissions set successfully."
+    } catch {
+     |error| log_error $"Failed to set permissions : ($error)"
+    }
+}
+
+export def set_alacritty_config_dir_ownership [] {
+		let themes_dir = $"/home/mecha/.alacritty-theme"
+    log_debug $"Setting ownership of ($themes_dir) to mecha:mecha"
+    
+    let rootfs_dir = $env.ROOTFS_DIR
+
+     # Use chroot to execute gsettings command
+    alias CHROOT = sudo chroot $rootfs_dir
+    
+    log_debug $"Setting ownership of ($themes_dir) to mecha:mecha"
+    try {
+    CHROOT chown -R mecha:mecha $themes_dir
+    log_info "Ownership set successfully."
+    } catch {
+     |error| log_error $"Failed to set ownership : ($error)"
+    }
+
+    # set permissions to 700
+    try {
+    CHROOT chmod 700 $themes_dir
+    log_info "Permissions set successfully."
+    } catch {
+     |error| log_error $"Failed to set permissions : ($error)"
+    }
+
+    # migrate alacritty
+    try {
+    /usr/bin/alacritty migrate
+    log_info "Permissions set successfully."
+    } catch {
+     |error| log_error $"Failed to set permissions : ($error)"
     }
 }
 
@@ -303,7 +345,8 @@ export def configure_mecha_system_pref [] {
         CHROOT gsettings set org.gnome.desktop.a11y.applications screen-keyboard-enabled true
         log_info "On-screen keyboard enabled system-wide."
     } catch {
-        log_error "Failed to enable on-screen keyboard system-wide."
+        |error|
+        log_error "Failed to enable on-screen keyboard system-wide. "
     }
     
     log_debug "Removing unused desktop files"
@@ -312,17 +355,60 @@ export def configure_mecha_system_pref [] {
         "/usr/share/applications/system-config-printer.desktop",
         "/usr/share/applications/vim.desktop",
         "/usr/share/applications/debian-uxterm.desktop",
-        "/usr/share/applications/debian-xterm.desktop"
+        "/usr/share/applications/debian-xterm.desktop",
+        "/usr/share/applications/mecha-connect.desktop",
     ]
     
-    for file in $files_to_remove {
-        let file_path = $"($rootfs_dir)($file)"
-        if ($file_path | path exists) {
-            log_debug $"Removing file: ($file_path)"
-            SUDO rm $file_path
-        }
+for file in $files_to_remove {
+    let file_path = $"($rootfs_dir)($file)"
+    if ($file_path | path exists) {
+        log_debug $"Removing file: ($file_path)"
+        SUDO rm $file_path
+    } else {
         log_debug "File not found: ($file_path)"
     }
+}
     
     log_info "System-wide settings configuration completed."
+}
+
+
+export def configure_mecha_connect_desktop_file [] {
+    log_info "Configuring Mecha Connect desktop entry:"
+    let rootfs_dir = $env.ROOTFS_DIR
+    
+    # Create mecha-connect.desktop file
+    let desktop_file_path = $rootfs_dir + "/usr/share/applications/org.mecha.connect.desktop"
+    let desktop_file_dir = $rootfs_dir + "/usr/share/applications"
+    
+    # Remove existing file if it exists
+    if ($desktop_file_path | path exists) {
+        log_debug $"Removing existing desktop file: ($desktop_file_path)"
+        SUDO rm $desktop_file_path
+    }
+    
+    let desktop_file_content = '[Desktop Entry]
+Type=Application
+TryExec=mecha-connect
+Exec=mecha-connect
+Icon=/usr/share/mechanix/shell/launcher/assets/icons/app_drawer/mecha_connect_icon.png
+Terminal=false
+Categories=System;
+
+Name=Connect
+GenericName=Connect
+Comment=Connect app
+    '
+    
+    # Create desktop entry file
+    log_debug $"Writing desktop file to: ($desktop_file_path)"
+    # Create empty file with sudo
+    SUDO touch $desktop_file_path
+    # Write the content
+    echo $desktop_file_content | SUDO tee $desktop_file_path out> /dev/null
+    # Set appropriate permissions
+    SUDO chmod 644 $desktop_file_path
+    log_debug "Desktop entry created successfully."
+    
+    log_info "Mecha Connect desktop configuration completed."
 }

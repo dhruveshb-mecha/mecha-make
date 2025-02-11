@@ -85,7 +85,7 @@ def main [machine: string, build_dir: string] {
     
     configure_audio 
     
-    update_os_release 
+    #update_os_release 
     
     configure_udev
     
@@ -110,6 +110,12 @@ def main [machine: string, build_dir: string] {
     configure_chromium_preferences
 
     configure_mecha_system_pref
+
+    configure_mecha_connect_desktop_file
+
+    set_config_dir_ownership
+
+    set_alacritty_config_dir_ownership
 
     unmount_sys_proc_volumes
 

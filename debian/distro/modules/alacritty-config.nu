@@ -30,6 +30,10 @@ export def configure_alacritty [] {
     SUDO cp $alacritty_bin $alacritty_dest
     log_debug "System binary installation completed successfully."
 
+    # Make the binary executable
+    SUDO chmod 755 $"($alacritty_dest)/alacritty"
+    log_debug "Alacritty binary permissions set successfully."
+
     # User-level configuration
     log_info "Setting up user alacritty configuration..."
     
@@ -55,6 +59,46 @@ export def configure_alacritty [] {
     log_debug $"Copying ($alacritty_theme) to ($theme_dest)"
     cp $alacritty_theme $"($theme_dest)/flat-remix.yml"
     log_info "flat-remix.yml theme file copied successfully."
+
+    
+    # Create Alacritty.desktop file
+    let desktop_file_path = $rootfs_dir + "/usr/share/applications/Alacritty.desktop"
+    let desktop_file_dir = $rootfs_dir + "/usr/share/applications"
+
+     # Check if desktop entry exists and remove it
+    if ($desktop_file_path | path exists) {
+        log_debug $"Removing existing desktop entry: ($desktop_file_path)"
+        SUDO rm $desktop_file_path
+    }
+
+    let desktop_file_content = '[Desktop Entry]
+Type=Application
+TryExec=alacritty
+Exec=alacritty
+Icon=/usr/share/mechanix/shell/launcher/assets/icons/app_drawer/terminal_icon.png
+Terminal=false
+Categories=System;TerminalEmulator;
+
+Name=Alacritty
+GenericName=Terminal
+Comment=A fast, cross-platform, OpenGL terminal emulator
+StartupNotify=true
+StartupWMClass=Alacritty
+Actions=New;
+
+[Desktop Action New]
+Name=New Terminal
+Exec=alacritty
+'
+
+    # Create desktop entry file
+    log_debug $"Writing desktop file to: ($desktop_file_path)"
+    # Write the content
+    echo $desktop_file_content | SUDO tee $desktop_file_path
+    # Set appropriate permissions
+    SUDO chmod 644 $desktop_file_path
+    log_debug "Desktop entry created successfully."
+
 
     log_debug "Alacritty configuration completed successfully."
 }
