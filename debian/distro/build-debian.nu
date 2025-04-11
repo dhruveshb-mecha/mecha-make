@@ -79,9 +79,7 @@ def main [machine: string, build_dir: string] {
     
     boot_script 
     
-    install_target_packages
-      
-    disable_diaply_service
+    install_target_packages      
     
     configure_audio 
     
