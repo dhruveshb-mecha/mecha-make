@@ -175,7 +175,7 @@ DefaultDependencies=no
 [Service]
 User=root
 Type=exec
-ExecStart=sudo /usr/bin/mechanix_system_dbus_server -c /etc/mechanix-gui/server/system/services-config.yml
+ExecStart=sudo /usr/bin/mechanix_system_dbus_server -c /etc/mechanix/server/system/services-config.yml
 Restart=always
 RestartSec=2s
 
@@ -217,7 +217,7 @@ export def configure_labwc_auto_launch [] {
     
     # Define the autostart content
     let autostart_content = "mechanix-launcher -s /etc/mechanix/shell/launcher/settings.yml &
-mechanix_desktop_dbus_server -s /etc/mechanix-gui/server/desktop/settings.yml &
+mechanix_desktop_dbus_server -s /etc/mechanix/server/desktop/settings.yml &
 mechanix-keyboard -s /etc/mechanix/shell/keyboard/settings.yml &"
 
     # Define the rc.xml content
