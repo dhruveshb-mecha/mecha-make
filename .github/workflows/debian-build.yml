@@ -79,6 +79,26 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: debian-image-rootfs.tar.gz 
+          name: debian-image-rootfs.tar.gz
           path: ./artifacts/*
 
+  pulp-upload:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: debian-image-rootfs
+          path: ./artifact
+
+      - name: Call pulp CLI setup reusable workflow
+        uses: ./.github/workflows/pulp-setup.yml
+
+      - name: Upload file to Pulp
+        run: |
+          pulp file content upload \
+            --repository comet \
+            --file ./artifact/debian-image-rootfs.tar.gz \
+            --relative-path rootfs/debian/comet/rev3/debian-image-rootfs.tar.gz
