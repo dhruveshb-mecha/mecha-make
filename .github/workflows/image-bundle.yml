@@ -1,0 +1,56 @@
+name: Uboot Post-Build
+
+on:
+  workflow_dispatch: # Allows triggering from UI or other workflows
+
+jobs:
+  postprocess:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Nushell
+        run: |
+          ARCH=$(uname -m) && \
+          case ${ARCH} in \
+          x86_64) NUSHELL_ARCH="x86_64-unknown-linux-gnu" ;; \
+          aarch64) NUSHELL_ARCH="aarch64-unknown-linux-gnu" ;; \
+          armv7l) NUSHELL_ARCH="armv7-unknown-linux-gnueabihf" ;; \
+          *) echo "Unsupported architecture: ${ARCH}" && exit 1 ;; \
+          esac && \
+          wget https://github.com/nushell/nushell/releases/download/0.96.0/nu-0.96.0-${NUSHELL_ARCH}.tar.gz && \
+          tar -xzvf nu-0.96.0-${NUSHELL_ARCH}.tar.gz && \
+          sudo mv nu-0.96.0-${NUSHELL_ARCH}/nu /usr/local/bin/ && \
+          rm -rf nu-0.96.0-${NUSHELL_ARCH}.tar.gz nu-0.96.0-${NUSHELL_ARCH}
+
+      - name: Run Download Script
+        run: |
+          cd pulp-content
+          nu download-assets.nu
+
+      - name: Bundle Image
+        run: |
+          cd pulp-content
+          #   we can take all the params as needed in the script
+          #   and pass them to the script (e.g., --id, --version, etc.)
+          #   for now, we are hardcoding the values
+          python3 image-bundle.py --id flash-v1 --version 1.0.0 --channel stable --machine comet --gen 1 --rev 3
+
+      - name: Make setup script executable
+        run: chmod +x pulp-content/pulp-setup.sh
+
+      - name: Set up Pulp CLI using script
+        run: ./pulp-content/pulp-setup.sh
+        env:
+          PULP_USERNAME: ${{ secrets.PULP_USERNAME }}
+          PULP_PASSWORD: ${{ secrets.PULP_PASSWORD }}
+          PULP_BASE_URL: ${{ secrets.PULP_BASE_URL }}
+
+      - name: Upload Image to Pulp
+        run: |
+          pulp file content upload \
+            --repository comet \
+            --file ./comet-gen1-rev3-v1.0.0.zip \
+            --relative-path iso/comet/comet-gen1-rev3-v1.0.0.zip

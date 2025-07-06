@@ -86,7 +86,7 @@ jobs:
         run: chmod +x pulp-content/pulp-setup.sh
 
       - name: Set up Pulp CLI using script
-        run: ./pulp-content/pulp-setup.sh
+        run: ./pulp-content/pulp-setup.nu
         env:
           PULP_USERNAME: ${{ secrets.PULP_USERNAME }}
           PULP_PASSWORD: ${{ secrets.PULP_PASSWORD }}
