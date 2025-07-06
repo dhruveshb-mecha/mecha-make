@@ -106,24 +106,24 @@ def collect_artifact [] {
     log_debug "Artifact collected successfully"
 }
 
-# Build debians
-def build_deb_packages [] {
-    log_info "Building debian packages for kernel modules"
+# Build RPM package for kernel modules
+def build_rpms [] {
+    log_info "Building RPM packages for kernel modules"
     let work_dir = $env.WORK_DIR
     log_debug $work_dir
     let linux_imx_dir = $work_dir + "/linux"
 
     cd $linux_imx_dir
-    make deb-pkg -j (nproc)
+    make rpm-pkg -j (nproc)
 
-    log_info "Debian packages built successfully"
+    log_info "RPM packages built successfully"
 
-    # Copy the debian packages to deploy directory
-    let deploy_dir = $env.DEPLOY_DIR | path join "kernel" | path join "debs"
+    # Copy the RPM packages to deploy directory
+    let deploy_dir = $env.DEPLOY_DIR | path join "kernel" | path join "RPMS"
     create_dir_if_not_exist $deploy_dir
 
     log_debug $deploy_dir
-    let pattern = $work_dir | path join "*.deb"
+    let pattern = $work_dir | path join "*.rpm"
     log_debug $"Debian packages copied to deploy directory deploying to ($deploy_dir)"
     glob $pattern | each { |file| mv $file $deploy_dir }
 }

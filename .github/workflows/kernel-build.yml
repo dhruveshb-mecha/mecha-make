@@ -7,31 +7,24 @@ on:
     paths:
       - kernel/**  
       - .github/workflows/kernel-build.yml
+  workflow_dispatch:
 
-  workflow_dispatch: # Enables manual triggering of the workflow
-  
-      
 jobs:
   build:
     strategy:
       matrix:
         machine: [mecha-comet-gen1]
     runs-on: ubuntu-22.04
+    container:
+      image: fedora:42
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Install dependencies
         run: |
-          sudo apt-get update && \
-          sudo apt-get install -y \
-          sudo \
-          curl \
-          git \
-          curl \
-          rsync \
-          cpio \
-          debhelper
+          dnf -y update
+          dnf -y install sudo curl git rsync cpio @development-tools
+
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up Git SSH key
         run: |
@@ -43,12 +36,11 @@ jobs:
       - name: Install Nushell
         run: |
           curl -L https://github.com/nushell/nushell/releases/download/0.95.0/nu-0.95.0-x86_64-unknown-linux-gnu.tar.gz | tar xz
-          sudo mv nu-0.95.0-x86_64-unknown-linux-gnu/nu /usr/local/bin/
+          mv nu-0.95.0-x86_64-unknown-linux-gnu/nu /usr/local/bin/
           rm -rf nu-0.95.0-x86_64-unknown-linux-gnu
 
       - name: Build Directory
-        run: |
-          mkdir -p build
+        run: mkdir -p build
 
       - name: Run Kernel Build Script
         run: |
@@ -56,8 +48,7 @@ jobs:
           nu build.nu ${{ matrix.machine }} ../build
 
       - name: List all files
-        run: |
-          ls -laR build/deploy
+        run: ls -laR build/deploy
 
       - name: Prepare Kernel artifacts
         run: |
@@ -65,8 +56,7 @@ jobs:
           cp -r ./build/deploy/* ./artifacts
 
       - name: List all Artifacts
-        run: |
-          ls -laR artifacts
+        run: ls -laR artifacts
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -81,15 +71,14 @@ jobs:
           echo "VERSION=${VERSION}" >> $GITHUB_ENV    
 
       - name: Print Kernel Version
-        run: |
-          echo "Kernel version is ${{ env.VERSION }}"    
-      
+        run: echo "Kernel version is ${{ env.VERSION }}"
+
       - name: Create Tag
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git tag -a "${VERSION}" -m "Kernel build release ${VERSION}"
-          git push origin "${VERSION}"   
+          git push origin "${VERSION}"
 
       - name: Release
         uses: softprops/action-gh-release@v2
@@ -98,4 +87,4 @@ jobs:
           name: Kernel build release ${{ env.VERSION }}
           body: "Automatic release of Kernel version ${{ env.VERSION }}"
           files: |
-            artifacts/*   
+            artifacts/*

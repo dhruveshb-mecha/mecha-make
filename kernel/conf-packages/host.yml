@@ -1,16 +1,15 @@
 packages:
   - gcc-aarch64-linux-gnu
-  - libncurses-dev
+  - diffutils
+  - bc
+  - make
+  - gcc
+  - elfutils-libelf-devel
+  - openssl-devel
   - flex
   - bison
-  - openssl
-  - libssl-dev
-  - dkms
-  - libelf-dev
-  - libudev-dev
-  - libpci-dev
-  - libiberty-dev
-  - autoconf
-  - bc
-  - git
-  - build-essential
+  - dwarves
+  - ncurses-devel
+  - cpio
+  - rsync
+  - openssl-devel-engine
