@@ -133,7 +133,7 @@ def read_yaml_config [file_path: string] {
 def collect_rpm_packages [] {
     log_info "Collecting RPM packages"
     let work_dir = $env.WORK_DIR
-    let deploy_dir = $env.DEPLOY_DIR + "/kernel/RPMS"
+    let deploy_dir = $env.DEPLOY_DIR + "/kernel/"
     create_dir_if_not_exist $deploy_dir
 
     let rpm_packages = $work_dir + "/linux/rpmbuild/RPMS/"
