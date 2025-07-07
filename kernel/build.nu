@@ -95,7 +95,7 @@ def collect_artifact [] {
     let artifact_path_2 = $work_dir + $"/linux/arch/($arch)/boot/dts/freescale/($platform)*"
     
     # RPM packages path
-    let rpm_path = $work_dir + "/linux/RPMS"
+    let rpm_path = $work_dir + "linux/rpmbuild/RPMS"
     let rpm_deploy_dir = $deploy_dir + "/kernel/RPMS"
 
     # Create the target directory first
@@ -136,6 +136,11 @@ def build_rpms [] {
     let pattern = $work_dir | path join "*.rpm"
     log_debug $"Debian packages copied to deploy directory deploying to ($deploy_dir)"
     glob $pattern | each { |file| mv $file $deploy_dir }
+
+    log_info "RPM packages collected successfully"
+    # List the contents of the deploy directory
+    log_debug "Contents of deploy directory: "
+    ls $deploy_dir | each { |file| log_debug $file }
 }
 
 # Read yaml config
