@@ -94,15 +94,10 @@ def collect_artifact [] {
     let artifact_path_1 = $work_dir + $"/linux/arch/($arch)/boot/Image"
     let artifact_path_2 = $work_dir + $"/linux/arch/($arch)/boot/dts/freescale/($platform)*"
     
-    # RPM packages path
-    let rpm_path = $work_dir + "linux/rpmbuild/RPMS"
-    let rpm_deploy_dir = $deploy_dir + "/kernel/RPMS"
+    log_debug $"Artifact paths: ($artifact_path_1), ($artifact_path_2)"
 
-    # Create the target directory first
-    mkdir $rpm_deploy_dir
-
-    # Copy RPM folder and contents recursively
-    cp -r $rpm_path $rpm_deploy_dir
+    # Collect RPM packages
+    collect_rpm_packages
 
     cp $artifact_path_1 $deploy_dir
         # Find and copy the second artifact(s)
@@ -127,23 +122,23 @@ def build_rpms [] {
     make rpm-pkg -j (nproc)
 
     log_info "RPM packages built successfully"
-
-    # Copy the RPM packages to deploy directory
-    let deploy_dir = $env.DEPLOY_DIR | path join "kernel" | path join "RPMS"
-    create_dir_if_not_exist $deploy_dir
-
-    log_debug $deploy_dir
-    let pattern = $work_dir | path join "*.rpm"
-    log_debug $"Debian packages copied to deploy directory deploying to ($deploy_dir)"
-    glob $pattern | each { |file| mv $file $deploy_dir }
-
-    log_info "RPM packages collected successfully"
-    # List the contents of the deploy directory
-    log_debug "Contents of deploy directory: "
-    ls $deploy_dir | each { |file| log_debug $file }
 }
 
 # Read yaml config
 def read_yaml_config [file_path: string] {
     open $file_path
+}
+
+# Collect RPM packages
+def collect_rpm_packages [] {
+    log_info "Collecting RPM packages"
+    let work_dir = $env.WORK_DIR
+    let deploy_dir = $env.DEPLOY_DIR + "/kernel/RPMS"
+    create_dir_if_not_exist $deploy_dir
+
+    let rpm_pattern = $work_dir + "/linux/rpmbuild/RPMS/($env.ARCH)/*.rpm"
+    log_debug $"RPM packages will be copied to: ($deploy_dir)"
+    glob $rpm_pattern | each { |file| mv $file $deploy_dir }
+
+    log_info "RPM packages collected successfully"
 }
