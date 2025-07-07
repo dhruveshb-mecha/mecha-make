@@ -64,27 +64,3 @@ jobs:
           name: kernel-artifacts
           path: ./artifacts/*
 
-      - name: Read Kernel Version
-        id: read_version
-        run: |
-          VERSION=$(nu -c "open kernel/machines/${{ matrix.machine }}.yml | get version")
-          echo "VERSION=${VERSION}" >> $GITHUB_ENV    
-
-      - name: Print Kernel Version
-        run: echo "Kernel version is ${{ env.VERSION }}"
-
-      - name: Create Tag
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git tag -a "${VERSION}" -m "Kernel build release ${VERSION}"
-          git push origin "${VERSION}"
-
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ env.VERSION }}
-          name: Kernel build release ${{ env.VERSION }}
-          body: "Automatic release of Kernel version ${{ env.VERSION }}"
-          files: |
-            artifacts/*

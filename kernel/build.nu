@@ -92,8 +92,18 @@ def collect_artifact [] {
 
  
     let artifact_path_1 = $work_dir + $"/linux/arch/($arch)/boot/Image"
-    let artifact_path_2 = $work_dir + $"/linux/arch/($arch)/boot/dts/freescale/($platform)*"
-  
+    let artifact_path_2 = $work_dir + $"/linux/arch/($arch)/boot/dts/freescale/($platform)*"\
+    
+    # RPM packages path
+    let rpm_path = $work_dir + "/linux/RPMS"
+    let rpm_deploy_dir = $deploy_dir + "/kernel/RPMS"
+
+    # Create the target directory first
+    mkdir $rpm_deploy_dir
+
+    # Copy RPM folder and contents recursively
+    cp -r $rpm_path $rpm_deploy_dir
+
     cp $artifact_path_1 $deploy_dir
         # Find and copy the second artifact(s)
     let artifact_files_2 = glob $artifact_path_2
