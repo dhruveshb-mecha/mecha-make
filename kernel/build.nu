@@ -92,7 +92,7 @@ def collect_artifact [] {
 
  
     let artifact_path_1 = $work_dir + $"/linux/arch/($arch)/boot/Image"
-    let artifact_path_2 = $work_dir + $"/linux/arch/($arch)/boot/dts/freescale/($platform)*"\
+    let artifact_path_2 = $work_dir + $"/linux/arch/($arch)/boot/dts/freescale/($platform)*"
     
     # RPM packages path
     let rpm_path = $work_dir + "/linux/RPMS"
