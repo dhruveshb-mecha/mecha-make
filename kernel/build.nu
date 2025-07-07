@@ -51,8 +51,8 @@ def main [machine: string,build_dir: string] {
     # Build kernel
     build_kernel
 
-    # Build debians for kernel modules
-    build_deb_packages
+    # Build RPM for kernel modules
+    build_rpms
 
     # Collect artifact
     collect_artifact
