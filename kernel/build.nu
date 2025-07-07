@@ -136,9 +136,9 @@ def collect_rpm_packages [] {
     let deploy_dir = $env.DEPLOY_DIR + "/kernel/RPMS"
     create_dir_if_not_exist $deploy_dir
 
-    let rpm_pattern = $work_dir + "/linux/rpmbuild/RPMS/($env.ARCH)/*.rpm"
+    let rpm_packages = $work_dir + "/linux/rpmbuild/RPMS/"
     log_debug $"RPM packages will be copied to: ($deploy_dir)"
-    glob $rpm_pattern | each { |file| mv $file $deploy_dir }
+    cp -r $rpm_packages $deploy_dir
 
     log_info "RPM packages collected successfully"
 }
