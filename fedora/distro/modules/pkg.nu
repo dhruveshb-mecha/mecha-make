@@ -54,7 +54,7 @@ export def install_kernel_packages_from_source [] {
     #get kernel packages from the YAML configuration 
     let script_dir_path =  (open $build_conf_path | get include-path)
 
-    let kernel_packages_path = $script_dir_path+ "/firmware"
+    let kernel_packages_path = $script_dir_path + "/firmware"
 
     # this folder contains all rpm packages for the kernel we want to install
     if (ls $kernel_packages_path | is-empty) {
