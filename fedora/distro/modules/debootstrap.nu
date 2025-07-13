@@ -14,7 +14,7 @@ export def dnfstrap_fedora [] {
   let BUILD_CONF_PATH = $env.BUILD_CONF_PATH;
 
   # Check if `dnf` is installed
-  let dnf_installed = which dnf | is-empty | not
+  let dnf_installed = not (which dnf | is-empty)
   if not $dnf_installed {
     log_error "`dnf` is not installed, cannot continue further."
     return
