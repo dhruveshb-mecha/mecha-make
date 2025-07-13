@@ -7,7 +7,7 @@ ENV DNF_FLAGS="--setopt=install_weak_dependencies=False"
 
 
 # Install basic dependencies including cmake install sudo curl git rsync cpio @development-tools bc make gcc elfutils-libelf-devel openssl-devel flex bison dwarves ncurses-devel cpio rsync openssl-devel-engine rpm-build rpmdevtools dwarves openssl perl
-RUN dnf -y install \
+RUN dnf -y install --skip-unavailable \
     cmake \
     curl \
     git \
