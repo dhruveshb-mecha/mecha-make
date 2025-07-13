@@ -1,0 +1,68 @@
+packages:
+  - firmware.group
+  - linux.group
+  - system.group
+  - network.group
+  - build.group
+  - locale.group
+  - wayland.group
+  - greeter.group
+  - audio.group
+  - graphics.group
+  - mechanix.group
+package_groups:
+  - name: firmware
+    packages:
+      - uboot-tools
+
+  - name: system
+    packages:
+      - dbus
+      - nano
+      - openssh-server
+      - sudo
+      - bash-completion
+      - dosfstools
+      - cpufrequtils
+      - upower
+      - libglib2.0-0
+  - name: network
+    packages:
+      - bluez
+      - hostapd
+      - file
+      - ethtool
+      - network-manager
+      - net-tools
+      - curl
+      - wget
+      - unzip
+  - name: build
+    packages:
+      - python3
+  - name: graphics
+    packages:
+      - mesa-utils
+  - name: locale
+    packages:
+      - systemd-timesyncd
+      - locales
+      # - systemd-services
+  - name: wayland
+    packages:
+      - xwayland
+      - xorg
+      - labwc
+      - weston
+  - name: greeter
+    packages:
+      - greetd
+  - name: audio
+    packages:
+      - pulseaudio
+      - mpg123
+      - pulseaudio-module-bluetooth
+      - alsa-tools
+      - alsa-utils
+      - libasound2
+      - libasound2-plugins
