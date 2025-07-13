@@ -49,6 +49,8 @@ export def install_kernel_packages_from_source [] {
     let rootfs_dir = $env.ROOTFS_DIR
     alias CHROOT = sudo chroot $rootfs_dir
 
+    let build_conf_path = $env.BUILD_CONF_PATH
+
     #get kernel packages from the YAML configuration 
     let script_dir_path =  (open $build_conf_path | get include-path)
 
