@@ -25,25 +25,30 @@ export def dnfstrap_fedora [] {
 
   # Create the rootfs with dnf
   log_info $"Installing minimal Fedora $fedora_ver rootfs to ($rootfs_dir)..."
-  SUDO dnf --assumeyes --releasever=$fedora_ver \
-    --installroot=$rootfs_dir \
-    --setopt=install_weak_deps=False \
-    --setopt=tsflags=nodocs \
-    --nogpgcheck \
-    --use-host-config \
-    install \
-    @core \
-    dnf \
-    rpm \
-    bash \
-    glibc-langpack-en \
-    passwd \
-    shadow-utils \
-    hostname \
-    systemd \
-    vim-minimal\
-    nano \
-    coreutils 
+let dnf_args = [
+  "--assumeyes"
+  $"--releasever=($fedora_ver)"
+  $"--installroot=($rootfs_dir)"
+  "--setopt=install_weak_deps=False"
+  "--setopt=tsflags=nodocs"
+  "--nogpgcheck"
+  "--use-host-config"
+  "install"
+  "@core"
+  "dnf"
+  "rpm"
+  "bash"
+  "glibc-langpack-en"
+  "passwd"
+  "shadow-utils"
+  "hostname"
+  "systemd"
+  "vim-minimal"
+  "nano"
+  "coreutils"
+]
+
+SUDO dnf ...$dnf_args
 
   # Clean up unnecessary files
   SUDO dnf --installroot=$rootfs_dir --assumeyes clean all
