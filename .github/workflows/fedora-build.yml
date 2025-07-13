@@ -41,8 +41,8 @@ jobs:
       - name: Install Docker Engine from RPM repository
         run: |
           sudo dnf -y install dnf-plugins-core
-          sudo dnf install -y  --skip-unavailable  docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-          
+          sudo dnf install -y  --skip-unavailable  docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin      
+          sudo systemctl enable --now docker    
           sudo usermod -aG docker $USER
           newgrp docker
       - name: Checkout repository
