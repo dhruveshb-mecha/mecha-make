@@ -42,9 +42,7 @@ jobs:
         run: |
           sudo dnf -y install dnf-plugins-core
           sudo dnf install -y  --skip-unavailable  docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin      
-          sudo systemctl start docker   
-          sudo usermod -aG docker $USER
-          newgrp docker
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -54,15 +52,15 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Debug - List contents of debian directory
+      - name: Debug - List contents of fedora directory
         run: |
-          ls -R debian/packages
+          ls -R fedora/packages
 
       - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: debian/distro.Dockerfile
+          file: fedora/distro.Dockerfile
           push: false
           load: true
           tags: mechasystems/distro:latest
