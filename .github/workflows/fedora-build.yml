@@ -25,6 +25,14 @@ jobs:
           dnf -y update
           dnf -y install sudo curl git rsync cpio @development-tools bc make gcc elfutils-libelf-devel openssl-devel flex bison dwarves ncurses-devel cpio rsync openssl-devel-engine rpm-build rpmdevtools dwarves openssl perl
 
+      - name: Install Docker Engine from RPM repository
+        run: |
+          sudo dnf -y install dnf-plugins-core
+          sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+          sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+          sudo systemctl enable --now docker
+          sudo usermod -aG docker $USER
+          newgrp docker
       - name: Checkout repository
         uses: actions/checkout@v4
 
