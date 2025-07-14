@@ -6,7 +6,7 @@ ENV DNF_FLAGS="--setopt=install_weak_dependencies=False"
 
 # Install basic dependencies including cmake install sudo curl git rsync cpio @development-tools bc make gcc elfutils-libelf-devel openssl-devel flex bison dwarves ncurses-devel cpio rsync openssl-devel-engine rpm-build rpmdevtools dwarves openssl perl
 RUN dnf -y upgrade && \
-    dnf -y install --skip-broken sudo curl git rsync cpio @development-tools bc make gcc elfutils-libelf-devel openssl-devel flex bison uboot-tools dwarves ncurses-devel openssl-devel-engine rpm-build rpmdevtools openssl perl nu && \
+    dnf -y install --skip-broken sudo curl git rsync cpio @development-tools bc make gcc elfutils-libelf-devel openssl-devel flex bison uboot-tools mkpasswd dwarves ncurses-devel openssl-devel-engine rpm-build rpmdevtools openssl perl nu && \
     dnf clean all
 
 # Set up working directory
