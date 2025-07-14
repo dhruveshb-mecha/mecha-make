@@ -15,22 +15,23 @@ export def configure_networking [] {
     SUDO ls -l $"($rootfs_dir)/etc"
 
     # if resolv.conf already exists, remove it
-    if (ls $"($rootfs_dir)/etc/resolv.conf" | not-empty) {
+    let resolv_conf_path = $"($rootfs_dir)/etc/resolv.conf"
+    if ($resolv_conf_path | path exists) {
         log_debug "Removing existing resolv.conf"
-        SUDO rm $"($rootfs_dir)/etc/resolv.conf"
-        {
+        try {
+            SUDO rm -f $resolv_conf_path
             log_debug "Removed existing resolv.conf"
-        } catch {|err| 
+        } catch { |err|
             log_error $"Failed to remove resolv.conf: ($err)"
         }
     }
-    SUDO cp /etc/resolv.conf $"($rootfs_dir)/etc/resolv.conf"
-
-    # Copy hosts's resolv.conf and hosts
-    SUDO cp /etc/environment $"($rootfs_dir)/etc/environment"
-   
-    SUDO cp /etc/hosts $"($rootfs_dir)/etc/hosts"
     
+    # Copy host's resolv.conf (remove destination first to handle symlinks)
+    SUDO cp --remove-destination /etc/resolv.conf $resolv_conf_path
+
+    # Copy host's environment and hosts files
+    SUDO cp /etc/environment $"($rootfs_dir)/etc/environment"
+    SUDO cp /etc/hosts $"($rootfs_dir)/etc/hosts"
 
     log_debug "Configuring networking: done"
 }
