@@ -10,14 +10,25 @@ export def configure_networking [] {
 
     # List contents of the rootfs directory /etc
     log_debug $"Rootfs Directory: $rootfs_dir"
-    
+
     log_debug "Listing contents of /etc in rootfs:"
-    SUDO ls -l /build/assets/deploy/rootfs/etc
-   
+    SUDO ls -l $"($rootfs_dir)/etc"
+
+    # if resolv.conf already exists, remove it
+    if (ls $"($rootfs_dir)/etc/resolv.conf" | not-empty) {
+        log_debug "Removing existing resolv.conf"
+        SUDO rm $"($rootfs_dir)/etc/resolv.conf"
+        {
+            log_debug "Removed existing resolv.conf"
+        } catch {|err| 
+            log_error $"Failed to remove resolv.conf: ($err)"
+        }
+    }
+    SUDO cp /etc/resolv.conf $"($rootfs_dir)/etc/resolv.conf"
 
     # Copy hosts's resolv.conf and hosts
     SUDO cp /etc/environment $"($rootfs_dir)/etc/environment"
-    SUDO cp /etc/resolv.conf $"($rootfs_dir)/etc/resolv.conf"
+   
     SUDO cp /etc/hosts $"($rootfs_dir)/etc/hosts"
     
 
