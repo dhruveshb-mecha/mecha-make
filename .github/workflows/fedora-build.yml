@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: |
           dnf -y update
-          dnf -y install sudo curl git rsync cpio @development-tools bc make gcc elfutils-libelf-devel openssl-devel flex bison dwarves ncurses-devel cpio rsync openssl-devel-engine rpm-build rpmdevtools dwarves openssl perl
+          dnf -y install sudo curl git rsync cpio @development-tools bc make gcc elfutils-libelf-devel openssl-devel flex bison dwarves ncurses-devel cpio rsync openssl-devel-engine rpm-build rpmdevtools dwarves openssl perl uboot-tools
 
       - name: Set up Docker Engine on Fedora
         run: |
