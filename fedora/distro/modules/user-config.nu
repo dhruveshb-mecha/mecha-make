@@ -52,6 +52,6 @@ export def configure_default_user [] {
   CHROOT usermod -aG audio $user_name
   CHROOT usermod -aG input $user_name
   CHROOT usermod -aG render $user_name
-  CHROOT usermod -aG netdev $user_name
+
   CHROOT chsh -s /bin/bash $user_name
 }

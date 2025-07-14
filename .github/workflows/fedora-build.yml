@@ -104,6 +104,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: fedora-image-rootfs.tar.gz
-          path: ./artifacts/*
-          
+          path: ./artifacts/*       
 
