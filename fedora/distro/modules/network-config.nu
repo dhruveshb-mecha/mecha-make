@@ -9,8 +9,11 @@ export def configure_networking [] {
     let rootfs_dir = $env.ROOTFS_DIR
 
     # List contents of the rootfs directory /etc
-    log_debug $"Rootfs Directory: ($rootfs_dir)"
-    log_debug $"Contents of /etc: ($rootfs_dir/etc | ls)"  
+    log_debug $"Rootfs Directory: $rootfs_dir"
+    
+
+    ls $"($rootfs_dir/etc)" | each {|file| log_debug $"File: ($file)"}
+
     # Copy hosts's resolv.conf and hosts
     SUDO cp /etc/environment $"($rootfs_dir)/etc/environment"
     SUDO cp /etc/resolv.conf $"($rootfs_dir)/etc/resolv.conf"
