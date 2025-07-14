@@ -18,7 +18,7 @@ export def install_target_packages [] {
     CHROOT dnf -y makecache
 
     # Configure keyboard layout (if you have a function for this)
-    keyboard_config
+    #keyboard_config
 
     let package_groups = open $TARGET_INSTALLATION_CONF | get package_groups
 
