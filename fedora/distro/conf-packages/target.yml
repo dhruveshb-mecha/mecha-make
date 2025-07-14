@@ -64,5 +64,3 @@ package_groups:
       - pulseaudio-module-bluetooth
       - alsa-tools
       - alsa-utils
-      - libasound2
-      - libasound2-plugins

@@ -33,7 +33,7 @@ export def install_target_packages [] {
         for pkg in $pkg_group.packages {
             try {
                 log_debug $"Attempting to install package: ($pkg)"
-                CHROOT dnf -y --setopt=install_weak_deps=False --skip-unavailable install $pkg
+                CHROOT dnf -y --setopt=install_weak_deps=False install $pkg
             } catch {|err|
                 log_error $"Failed to install package ($pkg): ($err)"
                 continue
