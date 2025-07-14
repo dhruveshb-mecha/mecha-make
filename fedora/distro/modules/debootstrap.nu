@@ -24,12 +24,12 @@ export def dnfstrap_fedora [] {
   let arch = open $BUILD_CONF_PATH | get fedora | get arch
 
   # Create the rootfs with dnf
-  log_info $"Installing minimal Fedora $fedora_ver rootfs to ($rootfs_dir)..."
-let dnf_args = [
-  "--assumeyes"
-  $"--releasever=($fedora_ver)"
-  $"--installroot=($rootfs_dir)"
-  "--setopt=install_weak_deps=False"
+  log_info $"Installing minimal Fedora ($fedora_ver) rootfs to ($rootfs_dir)..."
+  let dnf_args = [
+    "--assumeyes"
+    $"--releasever=42"
+    $"--installroot=/build/assets/deploy/rootfs/"
+    "--setopt=install_weak_deps=False"
   "--setopt=tsflags=nodocs"
   "--nogpgcheck"
   "--use-host-config"
@@ -48,15 +48,15 @@ let dnf_args = [
   "coreutils"
 ]
 
-SUDO dnf ...$dnf_args
+  SUDO dnf ...$dnf_args
 
   # Clean up unnecessary files
-  SUDO dnf --installroot=$rootfs_dir --assumeyes clean all
+  SUDO dnf --installroot=/build/assets/deploy/rootfs --assumeyes clean all
 
 
 
   # Set default shell to bash
-  SUDO ln -sf /bin/bash $"($rootfs_dir)/bin/sh"
+  SUDO ln -sf /bin/bash /build/assets/deploy/rootfs/bin/sh
 
   log_info "Fedora rootfs created successfully."
 }
