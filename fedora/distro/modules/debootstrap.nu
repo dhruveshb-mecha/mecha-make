@@ -46,6 +46,7 @@ export def dnfstrap_fedora [] {
   "vim-minimal"
   "nano"
   "coreutils"
+  "uboot-tools"
 ]
 
   SUDO dnf ...$dnf_args
