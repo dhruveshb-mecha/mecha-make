@@ -11,8 +11,9 @@ export def configure_networking [] {
     # List contents of the rootfs directory /etc
     log_debug $"Rootfs Directory: $rootfs_dir"
     
-
-    ls $"($rootfs_dir/etc)" | each {|file| log_debug $"File: ($file)"}
+    log_debug "Listing contents of /etc in rootfs:"
+    SUDO ls -l /build/assets/deploy/rootfs/etc
+   
 
     # Copy hosts's resolv.conf and hosts
     SUDO cp /etc/environment $"($rootfs_dir)/etc/environment"

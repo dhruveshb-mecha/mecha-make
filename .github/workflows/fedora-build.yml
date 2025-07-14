@@ -105,3 +105,4 @@ jobs:
         with:
           name: fedora-image-rootfs.tar.gz
           path: ./artifacts/*
+          
