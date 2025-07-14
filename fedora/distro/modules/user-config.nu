@@ -46,7 +46,8 @@ export def configure_default_user [] {
   # sudo bash -c ("echo 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' > $rootfs_dir/home/mecha/.profile")
 
   log_debug $"Adding user to groups: ($user_name)"
-  CHROOT usermod -aG sudo $user_name
+  CHROOT groupadd -f wheel
+  CHROOT usermod -aG wheel $user_name
   CHROOT usermod -aG video $user_name
   CHROOT usermod -aG audio $user_name
   CHROOT usermod -aG input $user_name
