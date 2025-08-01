@@ -33,7 +33,7 @@ export def install_target_packages [] {
         for pkg in $pkg_group.packages {
             try {
                 log_debug $"Attempting to install package: ($pkg)"
-                CHROOT dnf -y --skip-broken --setopt=install_weak_deps=False install $pkg
+                CHROOT dnf -y --setopt=install_weak_deps=False install $pkg
             } catch {|err|
                 log_error $"Failed to install package ($pkg): ($err)"
                 continue
@@ -58,7 +58,7 @@ export def install_kernel_packages_from_repo [] {
     for pkg in $kernel_packages {
         try {
             log_debug $"Installing kernel package from repo: ($pkg)"
-            CHROOT dnf -y --skip-broken --setopt=install_weak_deps=False install $"($pkg)"
+            CHROOT dnf -y --setopt=install_weak_deps=False install $"($pkg)"
         } catch {|err|
             log_error $"Failed to install ($pkg): ($err)"
             return
