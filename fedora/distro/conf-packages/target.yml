@@ -14,7 +14,6 @@ package_groups:
   - name: firmware
     packages:
       - uboot-tools
-
   - name: system
     packages:
       - dbus
@@ -26,6 +25,8 @@ package_groups:
       - cpufrequtils
       - upower
       - libglib2.0-0
+      - glibc
+      - glibc-common
   - name: network
     packages:
       - bluez
@@ -66,11 +67,11 @@ package_groups:
       - alsa-utils
   - name: mechanix
     packages:
-      - mechanix-camera-0:0.1.17-1.aarch64
-      - mechanix-files-0:0.1.17-1.aarch64
-      - mechanix-keyboard-0:0.1.20-1.aarch64
-      - mechanix-launcher-0:0.1.20-1.aarch64
-      - mechanix-settings-0:0.1.17-1.aarch64
-      - mechanix_desktop_dbus_server-0:0.1.12-1.aarch64
-      - mechanix_system_dbus_server-0:0.1.12-1.aarch64
+      - mechanix-camera
+      - mechanix-files
+      - mechanix-keyboard
+      - mechanix-launcher
+      - mechanix-settings
+      - mechanix_desktop_dbus_server
+      - mechanix_system_dbus_server
       - alacritty
