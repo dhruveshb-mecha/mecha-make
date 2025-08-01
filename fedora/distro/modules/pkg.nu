@@ -97,10 +97,8 @@ gpgcheck=0
 
     log_info "Adding Mechanix RPM repository to yum.repos.d"
 
-    # Use tee inside chroot to write the repo file
-    echo $repo_contents 
-    | CHROOT tee $repo_file_path 
-    | complete > /dev/null
+    # Write the repo content inside the chroot using bash -c
+    CHROOT bash -c $"echo '($repo_contents)' > '($repo_file_path)'"
 
     if $env.LAST_EXIT_CODE != 0 {
         log_error "Failed to add RPM repository"
