@@ -64,3 +64,13 @@ package_groups:
       - pulseaudio-module-bluetooth
       - alsa-tools
       - alsa-utils
+  - name: mechanix
+    packages:
+      - mechanix-camera-0:0.1.17-1.aarch64
+      - mechanix-files-0:0.1.17-1.aarch64
+      - mechanix-keyboard-0:0.1.20-1.aarch64
+      - mechanix-launcher-0:0.1.20-1.aarch64
+      - mechanix-settings-0:0.1.17-1.aarch64
+      - mechanix_desktop_dbus_server-0:0.1.12-1.aarch64
+      - mechanix_system_dbus_server-0:0.1.12-1.aarch64
+      - alacritty

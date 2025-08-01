@@ -16,7 +16,7 @@ export def pack_root_fs [] {
 
   let tar_file_dir = $deploy_dir + "/fedora-image-rootfs.tar.gz"
 
-   SUDO tar -czvf $tar_file_dir -C $rootfs_dir .
+  SUDO tar -czvf $tar_file_dir -C $rootfs_dir .
 
   log_info "Successfully packed rootfs"
   log_debug $"Rootfs packed at: ($tar_file_dir)"

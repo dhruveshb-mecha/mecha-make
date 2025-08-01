@@ -43,82 +43,80 @@ export def install_target_packages [] {
 }
 
 
-export def install_kernel_packages_from_source [] {
-    log_info "Installing kernel packages:"
+export def install_kernel_packages_from_repo [] {
+    log_info "Installing kernel packages from configured RPM repo"
 
     let rootfs_dir = $env.ROOTFS_DIR
     alias CHROOT = sudo chroot $rootfs_dir
 
-    let build_conf_path = $env.BUILD_CONF_PATH
+    # Define the exact package names you want to install
+    let kernel_packages = [
+        "linux-headers-6.6.36+mecha+-0:6.6.36_g98f2850cc265-2.arm64"
+        "linux-image-6.6.36+mecha+-0:6.6.36_g98f2850cc265-2.arm64"
+    ]
 
-    #get kernel packages from the YAML configuration 
-    let script_dir_path =  (open $build_conf_path | get include-path)
-
-    let kernel_packages_path = $script_dir_path + "/firmware"
-
-    # this folder contains all rpm packages for the kernel we want to install
-    if (ls $kernel_packages_path | is-empty) {
-        log_info "No kernel packages found in: ($kernel_packages_path)"
-        return
-    }
-
-    for pkg in (ls $kernel_packages_path) {
+    for pkg in $kernel_packages {
         try {
-            log_debug $"Attempting to install kernel package: ($pkg)"
-            CHROOT dnf -y --setopt=install_weak_deps=False install $pkg
+            log_debug $"Installing kernel package from repo: ($pkg)"
+            CHROOT dnf -y --setopt=install_weak_deps=False install $"($pkg)"
         } catch {|err|
-            log_error $"Failed to install kernel package ($pkg): ($err)"
-            continue
+            log_error $"Failed to install ($pkg): ($err)"
+            return
         }
     }
 
-    log_info "Kernel packages installed successfully."
+    log_info "Kernel packages installed successfully from repo."
 
-    # we need to list content of /boot directory to check if kernel is installed
+    # Validate /boot contents to confirm installation
     let boot_dir = $rootfs_dir + "/boot"
     if (ls $boot_dir | is-empty) {
         log_error "Boot directory is empty, kernel installation might have failed."
         return
     }
-    log_info "Boot directory contains: ($boot_dir)"
-    log_info "Kernel packages installed successfully."
+
+    log_info "Boot directory contains:"
+    ls $boot_dir | each {|entry| log_info $"  ($entry.name)" }
+
+    log_info "Kernel install validation complete."
 }
 
 
-export def add_debian_mechanix_source [] {
+
+export def add_fedora_mechanix_repo [] {
     let rootfs_dir = $env.ROOTFS_DIR
     alias CHROOT = sudo chroot $rootfs_dir
 
-    let sources_list_path = "/etc/apt/sources.list"
+    let repo_file_path = "/etc/yum.repos.d/comet-pulp.repo"
+    let repo_contents = '''
+[comet-pulp]
+name=Comet Pulp RPM Repository
+baseurl=http://167.235.132.100:8080/pulp/content/comet-rpm/
+enabled=1
+gpgcheck=0
+'''
 
-    # Get the package source from the YAML configuration
-    let build_conf_path = $env.BUILD_CONF_PATH
-    let deb_package_sources = open $build_conf_path | get apt | get sources
+    log_info "Adding Mechanix RPM repository to yum.repos.d"
 
-    log_info "Adding Mechanix package sources to sources.list"
+    # Use tee inside chroot to write the repo file
+    echo $repo_contents 
+    | CHROOT tee $repo_file_path 
+    | complete > /dev/null
 
-    # Iterate through each source and add it to sources.list
-    $deb_package_sources | each { |source|
-        let source_line = $"deb [trusted=yes] ($source)"
-        log_debug $"Adding source: ($source_line)"
-        
-        sudo chroot $rootfs_dir bash -c $"echo '($source_line)' >> ($sources_list_path)"
-
-        if $env.LAST_EXIT_CODE != 0 {
-            log_error $"Failed to add source: ($source_line)"
-            return
-        }
+    if $env.LAST_EXIT_CODE != 0 {
+        log_error "Failed to add RPM repository"
+        return
     }
 
-    log_info "Successfully added all Mechanix package sources"
+    log_info "Successfully added RPM repository"
 
-    # Update package lists
-    log_info "Updating package lists"
-    CHROOT apt-get update
+    # Clean and update repo metadata
+    log_info "Cleaning and updating repository metadata"
+    CHROOT dnf clean all
+    CHROOT dnf makecache
 
     if $env.LAST_EXIT_CODE == 0 {
-        log_info "Successfully updated package lists"
+        log_info "Successfully updated repository metadata"
     } else {
-        log_error "Failed to update package lists"
+        log_error "Failed to update repository metadata"
     }
 }

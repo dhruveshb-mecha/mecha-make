@@ -73,18 +73,18 @@ def main [machine: string, build_dir: string] {
     
     make_root_home_dir
     
-    configure_networking 
-    
-   #add_debian_mechanix_source
-    
-    boot_script 
-    
-    install_target_packages     
+    configure_networking
 
-    install_kernel_packages_from_source 
-    
-    configure_audio 
-    
+    add_fedora_mechanix_repo
+
+    boot_script
+
+    install_target_packages
+
+    install_kernel_packages_from_repo
+
+    configure_audio
+
     #update_os_release 
     
     configure_udev
@@ -99,7 +99,7 @@ def main [machine: string, build_dir: string] {
     
     configure_greeter
     
-   #configure_mechanix_system_dbus 
+    configure_mechanix_system_dbus 
 
     configure_alacritty
     
@@ -111,7 +111,7 @@ def main [machine: string, build_dir: string] {
 
     configure_mecha_system_pref
 
-    #configure_mecha_connect_desktop_file
+    configure_mecha_connect_desktop_file
 
     set_config_dir_ownership
 
