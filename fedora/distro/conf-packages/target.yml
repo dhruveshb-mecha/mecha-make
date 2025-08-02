@@ -27,6 +27,7 @@ package_groups:
       - libglib2.0-0
       - glibc
       - glibc-common
+      - ncurses-libs
   - name: network
     packages:
       - bluez

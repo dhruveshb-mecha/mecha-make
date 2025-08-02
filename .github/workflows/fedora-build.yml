@@ -9,7 +9,7 @@ on:
       - fedora/distro/**
       - .github/workflows/fedora-build.yml
 
-  workflow_dispatch: # Manual trigger support
+  workflow_dispatch: # Enables manual triggering of the workflow
 
 jobs:
   build:
@@ -17,8 +17,32 @@ jobs:
       matrix:
         machine: [mecha-comet-gen1]
     runs-on: ubuntu-22.04
-
+    container:
+      image: fedora:42
     steps:
+      - name: Install dependencies
+        run: |
+          dnf -y update
+          dnf -y install sudo curl git rsync cpio @development-tools bc make gcc elfutils-libelf-devel openssl-devel flex bison dwarves ncurses-devel cpio rsync openssl-devel-engine rpm-build rpmdevtools dwarves openssl perl uboot-tools dnf5 dnf-utils dnf-automatic dnf-plugins-core dnf-plugin-system-upgrade
+
+      - name: Set up Docker Engine on Fedora
+        run: |
+          sudo dnf -y install dnf-plugins-core
+          # Manually add Docker repo (works regardless of DNF version)
+          sudo tee /etc/yum.repos.d/docker-ce.repo > /dev/null <<'EOF'
+          [docker-ce-stable]
+          name=Docker CE Stable - $basearch
+          baseurl=https://download.docker.com/linux/fedora/$releasever/$basearch/stable
+          enabled=1
+          gpgcheck=1
+          gpgkey=https://download.docker.com/linux/fedora/gpg
+          EOF
+
+      - name: Install Docker Engine from RPM repository
+        run: |
+          sudo dnf -y install dnf-plugins-core
+          sudo dnf install -y  --skip-unavailable  docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -30,9 +54,16 @@ jobs:
       - name: Set up Docker QEMU (for cross-arch build)
         uses: docker/setup-qemu-action@v3
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Debug - List contents of fedora directory
+        run: |
+          ls -R fedora/packages
+          echo "PLATFORM=linux/arm64" >> "$GITHUB_OUTPUT"
       - name: Set platform based on host architecture
         id: platform
         run: |
@@ -49,15 +80,21 @@ jobs:
           echo "Host architecture: ${{ steps.arch.outputs.ARCH }}"
           echo "Build platform: ${{ steps.platform.outputs.PLATFORM }}"
           echo "Use QEMU emulation: ${{ steps.platform.outputs.USE_EMU }}"
-
-      - name: Build Fedora Docker image for target arch
+      - name: Build Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: fedora/distro.Dockerfile
           platforms: ${{ steps.platform.outputs.PLATFORM }}
+          push: false
           load: true
           tags: mechasystems/distro:latest
+
+      - name: Debug - List Docker images
+        run: docker images
+
+      - name: Debug - Show Docker image details
+        run: docker inspect mechasystems/distro:latest
 
       - name: Remove existing container if it exists
         run: |
@@ -75,10 +112,12 @@ jobs:
 
       - name: Debug - List container filesystem
         if: failure()
-        run: docker exec distro-container ls -R /
+        run: |
+          docker exec distro-container ls -R /
 
-      - name: List artifacts
-        run: ls -R ./artifacts || echo "No artifacts found"
+      - name: list artifacts
+        run: |
+          ls -R ./artifacts || echo "No artifacts found"
 
       - name: Clean up
         if: always()
