@@ -81,7 +81,6 @@ def main [machine: string, build_dir: string] {
 
     install_target_packages
 
-    install_kernel_packages_from_repo
 
     configure_audio
 

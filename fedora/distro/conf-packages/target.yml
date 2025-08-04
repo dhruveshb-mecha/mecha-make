@@ -14,6 +14,12 @@ package_groups:
   - name: firmware
     packages:
       - uboot-tools
+  - name: linux
+    packages:
+      - kernel-0:6.6.36+mecha+-5.aarch64
+      - kernel-devel-0:6.6.36+mecha+-5.aarch64
+      - kernel-headers-0:6.6.36+mecha+-5.aarch64
+      - linux-dtb-comet
   - name: system
     packages:
       - dbus
@@ -75,4 +81,3 @@ package_groups:
       - mechanix-settings
       - mechanix_desktop_dbus_server
       - mechanix_system_dbus_server
-      - alacritty
