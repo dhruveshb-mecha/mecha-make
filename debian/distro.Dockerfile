@@ -12,7 +12,9 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     debootstrap \
     qemu-user-static \
     whois \
-    u-boot-tools 
+    u-boot-tools \
+    curl \
+    gnupg
 
 # Download and install Nushell
 RUN curl -fsSL https://apt.fury.io/nushell/gpg.key | gpg --dearmor -o /etc/apt/trusted.gpg.d/fury-nushell.gpg
