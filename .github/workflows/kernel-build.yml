@@ -30,7 +30,8 @@ jobs:
           git \
           curl \
           rsync \
-          cpio
+          cpio \
+          debhelper
 
       - name: Set up Git SSH key
         run: |
