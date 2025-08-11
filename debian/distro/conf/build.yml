@@ -12,8 +12,8 @@ ssh:
   authorized_keys: []
   is_password_authentication_disabled: false
 debian:
-  version: 12
-  name: bookworm
+  version: 13
+  name: trixie
 apt:
   sources: 
     - http://debian.mecha.build apollo main
