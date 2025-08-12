@@ -16,10 +16,12 @@ package_groups:
       - uboot-tools
   - name: linux
     packages:
-      - kernel-0:6.6.36+mecha+-5.aarch64
-      - kernel-devel-0:6.6.36+mecha+-5.aarch64
-      - kernel-headers-0:6.6.36+mecha+-5.aarch64
+      - kernel-0:6.6.36+mecha+
+      - kernel-devel-0:6.6.36+mecha+
+      - kernel-headers-0:6.6.36+mecha+
       - linux-dtb-comet
+      - imx-sdma-firmware
+      - bluez-firmware-1.0-1
   - name: system
     packages:
       - dbus
@@ -30,7 +32,6 @@ package_groups:
       - dosfstools
       - cpufrequtils
       - upower
-      - libglib2.0-0
       - glibc
       - glibc-common
       - ncurses-libs
@@ -40,7 +41,7 @@ package_groups:
       - hostapd
       - file
       - ethtool
-      - network-manager
+      - NetworkManager
       - net-tools
       - curl
       - wget
@@ -50,16 +51,14 @@ package_groups:
       - python3
   - name: graphics
     packages:
-      - mesa-utils
+
   - name: locale
     packages:
-      - systemd-timesyncd
-      - locales
-      # - systemd-services
+      - chrony      
+      - glibc-langpack-en
+      - glibc-locale-source
   - name: wayland
     packages:
-      - xwayland
-      - xorg
       - labwc
       - weston
   - name: greeter

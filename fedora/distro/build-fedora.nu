@@ -8,7 +8,6 @@ use modules/audio-config.nu *
 use modules/boot-config.nu *
 use modules/system-config.nu *
 use modules/user-config.nu *
-use modules/kernel-config.nu *
 use modules/pack-rootfs.nu *
 use modules/os-config.nu *
 use modules/clean-up.nu *
@@ -81,11 +80,8 @@ def main [machine: string, build_dir: string] {
 
     install_target_packages
 
-
     configure_audio
-
-    #update_os_release 
-    
+        
     configure_udev
     
     oem_images 

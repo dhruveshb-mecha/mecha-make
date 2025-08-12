@@ -2,7 +2,6 @@
 use logger.nu
 use os-config.nu *
 
-const HOST_INSTALLATION_CONF = "conf-packages/host.yml"
 const TARGET_INSTALLATION_CONF = "conf-packages/target.yml"
 
 alias CHROOT = sudo chroot
@@ -41,46 +40,6 @@ export def install_target_packages [] {
         }
     }
 }
-
-
-export def install_kernel_packages_from_repo [] {
-    log_info "Installing kernel packages from configured RPM repo"
-
-    let rootfs_dir = $env.ROOTFS_DIR
-    alias CHROOT = sudo chroot $rootfs_dir
-
-    # Define the exact package names you want to install
-    let kernel_packages = [
-        "linux-headers-6.6.36+mecha+-0:6.6.36_g98f2850cc265-2.arm64"
-        "linux-image-6.6.36+mecha+-0:6.6.36_g98f2850cc265-2.arm64"
-    ]
-
-    for pkg in $kernel_packages {
-        try {
-            log_debug $"Installing kernel package from repo: ($pkg)"
-            CHROOT dnf -y --setopt=install_weak_deps=False install $"($pkg)"
-        } catch {|err|
-            log_error $"Failed to install ($pkg): ($err)"
-            return
-        }
-    }
-
-    log_info "Kernel packages installed successfully from repo."
-
-    # Validate /boot contents to confirm installation
-    let boot_dir = $rootfs_dir + "/boot"
-    if (ls $boot_dir | is-empty) {
-        log_error "Boot directory is empty, kernel installation might have failed."
-        return
-    }
-
-    log_info "Boot directory contains:"
-    ls $boot_dir | each {|entry| log_info $"  ($entry.name)" }
-
-    log_info "Kernel install validation complete."
-}
-
-
 
 export def add_fedora_mechanix_repo [] {
     let rootfs_dir = $env.ROOTFS_DIR
