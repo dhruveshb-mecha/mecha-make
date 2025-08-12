@@ -1,0 +1,4 @@
+import:
+  - ~/.alacritty-theme/themes/flat-remix.yml
+window:
+  decorations: none
