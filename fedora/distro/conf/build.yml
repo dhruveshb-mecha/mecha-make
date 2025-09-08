@@ -1,0 +1,33 @@
+hostname: mecha-comet-m
+locale:
+  timezone: America/Los_Angeles
+  lang: en-US.UTF-8
+user:
+  name: mecha
+  password: mecha
+  is_password_expired: true
+ssh:
+  user_ca:
+  host_ca:
+  authorized_keys: []
+  is_password_authentication_disabled: false
+fedora:
+  version: 42
+  name: Adams
+  release: 42
+  codename: adams
+  arch: aarch64
+
+keyboard-config:
+  layout : "us"
+  model : "pc1067"
+  variant : ""
+  options : ""
+  toggle : "No toggling"
+
+#  make this as relative path
+packages-path: ./include/
+scripts-path:  ./../../uboot/include
+media-files : ./include/splash/
+firmware-files : ./include/packages/firmware
+include-path: ./include

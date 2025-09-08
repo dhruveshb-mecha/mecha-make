@@ -8,6 +8,7 @@ on:
     paths:
       - debian/distro/**
       - .github/workflows/debian-build.yml
+      - debian/distro.Dockerfile
 
   workflow_dispatch: # Enables manual triggering of the workflow
 

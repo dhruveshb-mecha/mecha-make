@@ -1,0 +1,82 @@
+packages:
+  - firmware.group
+  - linux.group
+  - system.group
+  - network.group
+  - build.group
+  - locale.group
+  - wayland.group
+  - greeter.group
+  - audio.group
+  - graphics.group
+  - mechanix.group
+package_groups:
+  - name: firmware
+    packages:
+      - uboot-tools
+  - name: linux
+    packages:
+      - kernel-0:6.6.36+mecha+
+      - kernel-devel-0:6.6.36+mecha+
+      - kernel-headers-0:6.6.36+mecha+
+      - linux-dtb-comet
+      - imx-sdma-firmware
+      - bluez-firmware
+  - name: system
+    packages:
+      - dbus
+      - nano
+      - openssh-server
+      - sudo
+      - bash-completion
+      - dosfstools
+      - cpufrequtils
+      - upower
+      - glibc
+      - glibc-common
+      - ncurses-libs
+  - name: network
+    packages:
+      - bluez
+      - hostapd
+      - file
+      - ethtool
+      - NetworkManager
+      - net-tools
+      - curl
+      - wget
+      - unzip
+  - name: build
+    packages:
+      - python3
+  - name: graphics
+    packages:
+
+  - name: locale
+    packages:
+      - chrony      
+      - glibc-langpack-en
+      - glibc-locale-source
+  - name: wayland
+    packages:
+      - labwc
+      - weston
+  - name: greeter
+    packages:
+      - greetd
+  - name: audio
+    packages:
+      - pulseaudio
+      - mpg123
+      - pulseaudio-module-bluetooth
+      - alsa-tools
+      - alsa-utils
+  - name: mechanix
+    packages:
+      - mechanix-camera
+      - mechanix-files
+      - mechanix-keyboard
+      - mechanix-launcher
+      - mechanix-settings
+      - mechanix_desktop_dbus_server
+      - mechanix_system_dbus_server
