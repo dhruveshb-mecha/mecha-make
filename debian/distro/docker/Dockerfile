@@ -19,18 +19,6 @@ RUN apt-get update && \
     debootstrap \
     qemu-user-static \
     cpio
-    # wget \
-    # build-essential \
-    # gcc-aarch64-linux-gnu \
-    # bison \
-    # flex \
-    # libssl-dev \
-    # libncurses-dev \
-    # uuid-dev \
-    # libgnutls28-dev \
-    # git \
-    # zlib1g-dev \
-    # device-tree-compiler
 
 # install ssh key
 RUN mkdir -p /root/.ssh
@@ -41,9 +29,10 @@ RUN chmod 600 /root/.ssh/id_rsa
 RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
 
 # Install Nushell
-RUN curl -L https://github.com/nushell/nushell/releases/download/0.95.0/nu-0.95.0-x86_64-unknown-linux-gnu.tar.gz | tar xz \
-    && mv nu-0.95.0-x86_64-unknown-linux-gnu/nu /usr/local/bin/ \
-    && rm -rf nu-0.95.0-x86_64-unknown-linux-gnu 
+RUN curl -fsSL https://apt.fury.io/nushell/gpg.key | gpg --dearmor -o /etc/apt/trusted.gpg.d/fury-nushell.gpg
+RUN echo "deb https://apt.fury.io/nushell/ /" | tee /etc/apt/sources.list.d/fury.list
+RUN apt update
+RUN apt install nushell
 
 #make build directory
 RUN mkdir ../build

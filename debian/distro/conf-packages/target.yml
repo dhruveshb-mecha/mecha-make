@@ -62,7 +62,7 @@ package_groups:
       - xorg
       # - meta-utils
       - libwlroots12t64
-      - labwc
+      - sway
       - weston
   - name: greeter
     packages:
