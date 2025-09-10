@@ -1,15 +1,17 @@
 name: Debian Build
 
 on:
+  schedule:
+    - cron: "1 0 * * *"   # Runs every day at 12:01 AM UTC
   push:
     branches:
       - main
       - dev*
+      - pre-release*
     paths:
       - debian/distro/**
       - .github/workflows/debian-build.yml
       - debian/distro.Dockerfile
-
   workflow_dispatch: # Enables manual triggering of the workflow
 
 jobs:
@@ -82,4 +84,3 @@ jobs:
         with:
           name: debian-image-rootfs.tar.gz 
           path: ./artifacts/*
-
