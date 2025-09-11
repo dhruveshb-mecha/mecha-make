@@ -29,6 +29,11 @@ export def update_pre_release_assets [] {
     sudo cp ($extracted_dir + "/Image") ($rootfs_dir + "/boot/Image")
     log_debug "Boot Image updated in target rootfs."
 
+    # Copy dtb
+    sudo mkdir -p ($rootfs_dir + "/boot")
+    sudo cp ($extracted_dir + "/imx8mp-mecha-comet-m-gen6.dtb") ($rootfs_dir + "/boot/imx8mp-mecha-comet-m-gen6.dtb")
+    log_debug "Device Tree Blobs updated in target rootfs."
+
     # Copy kernel modules (entire folder)
     sudo mkdir -p ($rootfs_dir + "/lib/modules")
     sudo cp -r ($extracted_dir + "/6.12.20-gdfaf2136deb2-dirty") ($rootfs_dir + "/lib/modules/")
