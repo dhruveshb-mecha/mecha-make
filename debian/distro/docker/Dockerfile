@@ -18,7 +18,8 @@ RUN apt-get update && \
     rsync \
     debootstrap \
     qemu-user-static \
-    cpio
+    cpio \
+    unzip 
 
 # install ssh key
 RUN mkdir -p /root/.ssh
