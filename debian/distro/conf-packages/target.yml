@@ -23,7 +23,6 @@ package_groups:
       - upower
       - libglib2.0-0
       - glmark2-es2-wayland
-      - libgpiod
       - gpiod
       - lsof
   - name: network
@@ -71,14 +70,3 @@ package_groups:
   - name: web
     packages:
       - chromium
-  - name: mechanix
-    packages:
-      - mechanix-launcher
-      - mechanix-keyboard
-      - mechanix_desktop_dbus_server
-      - mechanix_system_dbus_server
-      - mechanix-camera
-      - mechanix-files
-      - mechanix-settings
-      - mecha-connect
-      - mecha-agent
