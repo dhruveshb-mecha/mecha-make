@@ -88,7 +88,7 @@ def collect_artifact [] {
     let arch = $env.ARCH
 
     let artifact_path_1 = $work_dir + $"/linux/arch/($arch)/boot/Image"
-    let artifact_path_2 = $work_dir + $"/linux/arch/($arch)/boot/dts/freescale/imx8mm-mecha-comet-m-gen1*"
+    let artifact_path_2 = $work_dir + $"/linux/arch/($arch)/boot/dts/freescale/imx8mp-mecha-comet-m*"
   
     cp $artifact_path_1 $deploy_dir
         # Find and copy the second artifact(s)
