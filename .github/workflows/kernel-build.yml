@@ -4,6 +4,7 @@ on:
     branches:
       - main
       - dev*
+      - pre-release*
     paths:
       - kernel/**  
       - .github/workflows/kernel-build.yml
