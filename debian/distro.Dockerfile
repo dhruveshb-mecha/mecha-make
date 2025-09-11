@@ -14,7 +14,8 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     whois \
     u-boot-tools \
     curl \
-    gnupg
+    gnupg \
+    unzip 
 
 # Download and install Nushell
 RUN curl -fsSL https://apt.fury.io/nushell/gpg.key | gpg --dearmor -o /etc/apt/trusted.gpg.d/fury-nushell.gpg
