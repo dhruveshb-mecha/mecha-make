@@ -16,7 +16,7 @@ jobs:
   build:
     strategy:
       matrix:
-        machine: [mecha-comet-gen1]
+        machine: [mecha-comet-m-gen6]
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
