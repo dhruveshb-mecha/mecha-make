@@ -6,8 +6,8 @@ export def update_pre_release_assets [] {
     log_info "Updating Mecha Comet pre-release assets in target rootfs"
 
     # Rootfs target 
-    let rootfs_dir = $env.ROOTFS_DIR    
-    log_debug $"Target rootfs directory: $(rootfs_dir)"
+    let rootfs_dir = $env.ROOTFS_DIR
+    log_debug $"Target rootfs directory: ($rootfs_dir)"
 
     # Temp dir
     let tmp_dir = "/tmp/mecha-assets"
@@ -15,7 +15,7 @@ export def update_pre_release_assets [] {
 
     # Download zip file
     let url = "https://pub-a2f44c787cec4290833312e57fd59522.r2.dev/mecha-comet-pre-release-assets.zip"
-    log_debug $"Downloading pre-release assets from $(url)"
+    log_debug $"Downloading pre-release assets from ($url)"
     curl -o ($tmp_dir + "/mecha-comet-pre-release-assets.zip") $url
 
     # Extract zip
