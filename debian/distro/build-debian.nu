@@ -15,6 +15,7 @@ use modules/clean-up.nu *
 use modules/debootstrap.nu *
 use modules/chromium-config.nu *
 use modules/alacritty-config.nu *
+use modules/pre-release-config.nu *
 
 
 const BUILD_CONF_PATH = "./conf/build.yml" 
@@ -80,6 +81,8 @@ def main [machine: string, build_dir: string] {
     boot_script 
     
     install_target_packages      
+
+    update_pre_release_assets
     
     configure_audio 
     
