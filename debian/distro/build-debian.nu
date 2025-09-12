@@ -63,9 +63,6 @@ def main [machine: string, build_dir: string] {
     TMP_DIR: $tmp_dir,
     ROOTFS_DIR: $rootfs_dir,
     BUILD_CONF_PATH: $BUILD_CONF_PATH,
-    # LC_ALL: "C",
-    # LANGUAGE: "C",
-    # LANG: "C"
   }
 
 
@@ -78,7 +75,7 @@ def main [machine: string, build_dir: string] {
     
     add_debian_mechanix_source
     
-    boot_script 
+    #boot_script 
     
     install_target_packages      
 
@@ -90,7 +87,7 @@ def main [machine: string, build_dir: string] {
     
     configure_udev
     
-    oem_images 
+    #oem_images 
     
     configure_bluetooth
     
