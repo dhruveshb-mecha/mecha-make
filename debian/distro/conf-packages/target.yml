@@ -19,12 +19,13 @@ package_groups:
       - sudo
       - bash-completion
       - dosfstools
-      - cpufrequtils
       - upower
       - libglib2.0-0
       - glmark2-es2-wayland
       - gpiod
       - lsof
+      - iw
+      - udhcpc
   - name: network
     packages:
       - bluez
@@ -54,6 +55,7 @@ package_groups:
       # - meta-utils
       - libwlroots12t64
       - labwc
+      - sway
       - weston
   - name: greeter
     packages:
