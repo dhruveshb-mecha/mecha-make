@@ -76,7 +76,7 @@ def main [machine: string, build_dir: string] {
     
     add_debian_mechanix_source
     
-    #boot_script 
+    boot_script 
     
     install_target_packages      
 
@@ -88,7 +88,7 @@ def main [machine: string, build_dir: string] {
     
     configure_udev
     
-    #oem_images 
+    oem_images 
     
     configure_bluetooth
     
