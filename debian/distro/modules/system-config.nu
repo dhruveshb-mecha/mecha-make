@@ -69,11 +69,94 @@ export def configure_greeter [] {
   let rootfs_dir = $env.ROOTFS_DIR
 
   alias CHROOT = sudo chroot $rootfs_dir
+  let config_append = "\n" + ("# Performs auto login for default user
+
+[initial_session]
+command = \"labwc\"
+user = \"mecha\"" | str trim) + "\n"
+
+  let greetd_config_path = $rootfs_dir + "/etc/greetd/config.toml"
+  echo $config_append | sudo tee -a $greetd_config_path
 
   log_debug "Disabling getty@tty1.service"
   CHROOT systemctl disable getty@tty1.service
   CHROOT systemctl enable greetd.service
 
+}
+
+export def configure_labwc_auto_launch [] {
+    log_info "Configuring labwc autostart and rc.xml:"
+    let rootfs_dir = $env.ROOTFS_DIR
+    
+    # Define the config directory relative to rootfs
+    let config_dir = $"($rootfs_dir)/home/mecha/.config/labwc"
+    let autostart_file = $"($config_dir)/autostart"
+    let rc_file = $"($config_dir)/rc.xml"
+    
+    # Create the config directory if it doesn't exist
+    if not ($config_dir | path exists) {
+        log_debug $"Creating directory: ($config_dir)"
+        mkdir $config_dir
+    }
+    
+    # Define the autostart content
+    let autostart_content = "mechanix-launcher -s /etc/mechanix/shell/launcher/settings.yml &
+mechanix_desktop_dbus_server -s /etc/mechanix/server/desktop/settings.yml &
+mechanix-keyboard -s /etc/mechanix/shell/keyboard/settings.yml &"
+
+    # Define the rc.xml content
+    let rc_content = '<?xml version="1.0"?>
+<labwc_config>
+    <windowRules>
+        <windowRule identifier="*" serverDecoration="no" />
+        <windowRule title="Alacritty">
+            <action name="ToggleMaximize" />
+        </windowRule>
+        <windowRule title="Mozilla Firefox">
+            <action name="ToggleMaximize" />
+        </windowRule>
+        <windowRule title="Nautilus">
+            <action name="ToggleMaximize" />
+        </windowRule>
+        <windowRule title="Chromium">
+            <action name="ToggleMaximize" />
+        </windowRule>
+        <windowRule title="Mecha Connect">
+            <action name="ToggleMaximize" />
+        </windowRule>
+        <windowRule title="Files">
+            <action name="ToggleMaximize" />
+        </windowRule>
+        <windowRule title="Camera">
+            <action name="ToggleMaximize" />
+        </windowRule>
+        <windowRule title="Settings">
+            <action name="ToggleMaximize" />
+        </windowRule>
+    </windowRules>
+</labwc_config>'
+    
+    # Configure autostart file
+    if not ($autostart_file | path exists) {
+        log_debug $"Creating autostart file: ($autostart_file)"
+        echo $autostart_content | save $autostart_file
+        # Set proper permissions
+        SUDO chmod 644 $autostart_file
+    } else {
+        log_debug $"Autostart file already exists at ($autostart_file)"
+    }
+
+    # Configure rc.xml file
+    if not ($rc_file | path exists) {
+        log_debug $"Creating rc.xml file: ($rc_file)"
+        echo $rc_content | save $rc_file
+        # Set proper permissions
+        SUDO chmod 644 $rc_file
+    } else {
+        log_debug $"rc.xml file already exists at ($rc_file)"
+    }
+    
+    log_info "Labwc configuration completed."
 }
 
 

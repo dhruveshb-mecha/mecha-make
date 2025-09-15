@@ -100,6 +100,8 @@ def main [machine: string, build_dir: string] {
     configure_mechanix_system_dbus 
 
     configure_alacritty
+
+    configure_labwc_auto_launch
            
     configure_sys_files
 
