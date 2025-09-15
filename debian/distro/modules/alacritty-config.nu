@@ -14,10 +14,10 @@ export def configure_alacritty [] {
     let alacritty_bin = $alacritty_package_path + "alacritty"
     log_debug $"Alacritty binary path: ($alacritty_bin)"
 
-    let alacritty_config = $alacritty_package_path + "alacritty.yml"
+    let alacritty_config = $alacritty_package_path + "alacritty.toml"
     log_debug $"Alacritty configuration path: ($alacritty_config)"
 
-    let alacritty_theme = $alacritty_package_path + "flat-remix.yml"
+    let alacritty_theme = $alacritty_package_path + "flat-remix.toml"
     log_debug $"Alacritty theme path: ($alacritty_theme)"
     
     let alacritty_dest = $"($rootfs_dir)/usr/bin/"
@@ -45,8 +45,8 @@ export def configure_alacritty [] {
     
     # Copy configuration file
     log_debug $"Copying ($alacritty_config) to ($config_dest)"
-    cp $alacritty_config $"($config_dest)/alacritty.yml"
-    log_info "alacritty.yml copied successfully."
+    cp $alacritty_config $"($config_dest)/alacritty.toml"
+    log_info "alacritty.toml copied successfully."
 
     # Create theme directory and copy theme
     log_info "Setting up Alacritty theme..."
@@ -57,8 +57,8 @@ export def configure_alacritty [] {
     
     # Copy theme file
     log_debug $"Copying ($alacritty_theme) to ($theme_dest)"
-    cp $alacritty_theme $"($theme_dest)/flat-remix.yml"
-    log_info "flat-remix.yml theme file copied successfully."
+    cp $alacritty_theme $"($theme_dest)/flat-remix.toml"
+    log_info "flat-remix.toml theme file copied successfully."
 
     
     # Create Alacritty.desktop file
