@@ -72,3 +72,11 @@ package_groups:
   - name: web
     packages:
       - chromium
+  - name: mechanix
+    packages:
+      - mechanix-launcher
+      - mechanix-keyboard
+      - mechanix_desktop_dbus_server
+      - mechanix_system_dbus_server
+      - mecha-connect
+      - mecha-agent
