@@ -16,6 +16,7 @@ debian:
   name: trixie
 apt:
   sources: 
+    - http://167.235.132.100:8080/pulp/content/comet-deb pulp upload 
     - http://debian.mecha.build apollo main
 os-release:
   ID: mechanix
