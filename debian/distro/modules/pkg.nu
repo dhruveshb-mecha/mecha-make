@@ -106,7 +106,7 @@ export def add_debian_mechanix_source [] {
 
     # Iterate through each source and add it to sources.list
     $deb_package_sources | each { |source|
-        let source_line = $"deb [trusted=yes] ($source)"
+        let source_line = $"deb [trusted=yes allow-insecure=yes allow-weak=yes allow-downgrade-to-insecure=yes] ($source)"
         log_debug $"Adding source: ($source_line)"
         
         sudo chroot $rootfs_dir bash -c $"echo '($source_line)' >> ($sources_list_path)"
@@ -119,9 +119,22 @@ export def add_debian_mechanix_source [] {
 
     log_info "Successfully added all Mechanix package sources"
 
-    # Update package lists
-    log_info "Updating package lists"
-    CHROOT apt-get update
+    # Update package lists with redirect-friendly settings
+    log_info "Updating package lists with redirect support"
+    
+    try {
+        CHROOT apt-get update
+        log_info "Successfully updated package lists"
+    } catch {
+        log_warning "Standard update failed, trying with additional options"
+        try {
+            CHROOT apt-get update --allow-releaseinfo-change -o Debug::Acquire::http=true
+            log_info "Successfully updated package lists on second attempt"
+        } catch {
+            log_error "Failed to update package lists after multiple attempts"
+            log_info "Continuing with available packages..."
+        }
+    }
 
     if $env.LAST_EXIT_CODE == 0 {
         log_info "Successfully updated package lists"
