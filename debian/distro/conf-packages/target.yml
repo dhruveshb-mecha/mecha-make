@@ -38,6 +38,7 @@ package_groups:
       - iw
       - udhcpc
       - kanshi
+      - patchelf
   - name: network
     packages:
       - bluez
@@ -84,6 +85,7 @@ package_groups:
   - name: web
     packages:
       - chromium
+      - firefox-esr
   - name: mechanix
     packages:
       - mechanix-launcher
@@ -92,3 +94,6 @@ package_groups:
       - mechanix_system_dbus_server
       - mecha-connect
       - mecha-agent
+      - mechanix-files-beta
+      - mechanix-notes-beta
+      - mechanix-settings-beta

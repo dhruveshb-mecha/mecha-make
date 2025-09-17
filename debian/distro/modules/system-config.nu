@@ -100,7 +100,8 @@ export def configure_labwc_auto_launch [] {
     }
     
     # Define the autostart content
-    let autostart_content = "mechanix-launcher -s /etc/mechanix/shell/launcher/settings.yml &
+    let autostart_content = "kanshi >/dev/null 2>&1 &
+mechanix-launcher -s /etc/mechanix/shell/launcher/settings.yml &
 mechanix_desktop_dbus_server -s /etc/mechanix/server/desktop/settings.yml &
 mechanix-keyboard -s /etc/mechanix/shell/keyboard/settings.yml &"
 

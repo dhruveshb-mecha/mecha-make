@@ -17,6 +17,7 @@ use modules/chromium-config.nu *
 use modules/alacritty-config.nu *
 use modules/pre-release-config.nu *
 use modules/kanshi-config.nu *
+use modules/app-linker.nu *
 
 
 const BUILD_CONF_PATH = "./conf/build.yml" 
@@ -105,6 +106,8 @@ def main [machine: string, build_dir: string] {
     configure_kanshi
 
     configure_labwc_auto_launch
+
+    configure_app_linking
            
     configure_sys_files
 
