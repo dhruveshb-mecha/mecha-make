@@ -65,6 +65,7 @@ def main [machine: string, build_dir: string] {
     TMP_DIR: $tmp_dir,
     ROOTFS_DIR: $rootfs_dir,
     BUILD_CONF_PATH: $BUILD_CONF_PATH,
+    DEBIAN_FRONTEND: noninteractive
   }
 
 
