@@ -50,7 +50,7 @@ export def install_target_packages [] {
     
     # Retry update up to 3 times if it fails or is slow
     let max_retries = 3
-    let retry = 0
+    mut retry = 0
     while ($retry < $max_retries) {
         log_debug $"Attempt ($retry + 1) for apt-get update"
         CHROOT apt-get update -o Acquire::Retries=3
@@ -59,8 +59,8 @@ export def install_target_packages [] {
             break
         } else {
             log_error $"apt-get update failed on attempt ($retry + 1)"
-            sleep 2
-            retry += 1
+            sleep 5sec
+            $retry = $retry + 1
         }
     }
 
