@@ -22,6 +22,17 @@ package_groups:
       - linux-image-6.6.36+mecha+=6.6.36-g98f2850cc265-1
       - linux-headers-6.6.36+mecha+=6.6.36-g98f2850cc265-1
       - linux-libc-dev=6.6.36-g98f2850cc265-1
+  - name: mechanix
+    packages:
+      - mechanix-launcher
+      - mechanix-keyboard
+      - mechanix_desktop_dbus_server
+      - mechanix_system_dbus_server
+      - mecha-connect
+      - mecha-agent
+      - mechanix-files-beta
+      - mechanix-notes-beta
+      - mechanix-settings-beta
   - name: system
     packages:
       - dbus
@@ -86,14 +97,3 @@ package_groups:
     packages:
       - chromium
       - firefox-esr
-  - name: mechanix
-    packages:
-      - mechanix-launcher
-      - mechanix-keyboard
-      - mechanix_desktop_dbus_server
-      - mechanix_system_dbus_server
-      - mecha-connect
-      - mecha-agent
-      - mechanix-files-beta
-      - mechanix-notes-beta
-      - mechanix-settings-beta
