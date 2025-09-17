@@ -44,40 +44,52 @@ export def install_target_packages [] {
     let rootfs_dir = $env.ROOTFS_DIR
     alias CHROOT = sudo chroot $rootfs_dir
 
-    # clean up and update
+    # Clean old cache and update package lists
     CHROOT apt-get clean
-    CHROOT apt-get update
+    log_info "Updating package lists..."
+    
+    # Retry update up to 3 times if it fails or is slow
+    let max_retries = 3
+    let retry = 0
+    while ($retry < $max_retries) {
+        log_debug $"Attempt ($retry + 1) for apt-get update"
+        CHROOT apt-get update -o Acquire::Retries=3
+        if $env.LAST_EXIT_CODE == 0 {
+            log_info "apt-get update completed successfully"
+            break
+        } else {
+            log_error $"apt-get update failed on attempt ($retry + 1)"
+            sleep 2
+            retry += 1
+        }
+    }
 
-    # Configure keyboard layout
-    keyboard_config
-
-
+    if $retry == $max_retries {
+        log_error "apt-get update failed after 3 attempts, aborting package install"
+        return
+    }
 
     let package_groups = open $TARGET_INSTALLATION_CONF | get package_groups
 
     for pkg_group in $package_groups {
         log_debug $"Processing package group: ($pkg_group.packages)"
 
-        # Check if the length of the list of packages is 0
         if ($pkg_group.packages | length) == 0 {
             log_debug "No packages found in this group."
             continue
         }
 
-        # Iterate over each package within the group
         for pkg in $pkg_group.packages {
             try {
                 log_debug $"Attempting to install package: ($pkg)"
-                # Install the package
+                # Install package after update is guaranteed complete
                 CHROOT apt-get -y --allow-change-held-packages install $pkg
             } catch {|err| 
                 log_error $"Failed to install package ($pkg): ($err)"
-                # Continue with next package even if this one fails
                 continue
             }
         }
     }
-
 }
 
 export def add_debian_mechanix_source [] {
