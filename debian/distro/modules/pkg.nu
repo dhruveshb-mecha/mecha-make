@@ -44,11 +44,12 @@ export def install_target_packages [] {
     let rootfs_dir = $env.ROOTFS_DIR
     alias CHROOT = sudo chroot $rootfs_dir
 
-    # Clean old cache and update package lists
+    # Clean old cache
+    log_info "Cleaning old apt cache..."
     CHROOT apt-get clean
+
+    # Retry apt-get update up to 3 times
     log_info "Updating package lists..."
-    
-    # Retry update up to 3 times if it fails or is slow
     let max_retries = 3
     mut retry = 0
     while ($retry < $max_retries) {
@@ -65,32 +66,35 @@ export def install_target_packages [] {
     }
 
     if $retry == $max_retries {
-        log_error "apt-get update failed after 3 attempts, aborting package install"
+        log_error "apt-get update failed after 3 attempts. Aborting package install."
         return
     }
 
+    # Read package groups from config
     let package_groups = open $TARGET_INSTALLATION_CONF | get package_groups
 
     for pkg_group in $package_groups {
         log_debug $"Processing package group: ($pkg_group.packages)"
 
         if ($pkg_group.packages | length) == 0 {
-            log_debug "No packages found in this group."
+            log_debug "No packages found in this group. Skipping."
             continue
         }
 
         for pkg in $pkg_group.packages {
             try {
-                log_debug $"Attempting to install package: ($pkg)"
-                # Install package after update is guaranteed complete
+                log_debug $"Installing package: ($pkg)"
                 CHROOT apt-get -y --allow-change-held-packages install $pkg
             } catch {|err| 
-                log_error $"Failed to install package ($pkg): ($err)"
+                log_error $"Failed to install package ($pkg): ($err). Continuing..."
                 continue
             }
         }
     }
+
+    log_info "Target package installation complete."
 }
+
 
 export def add_debian_mechanix_source [] {
     let rootfs_dir = $env.ROOTFS_DIR
