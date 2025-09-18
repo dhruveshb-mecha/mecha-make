@@ -106,12 +106,10 @@ export def add_debian_mechanix_source [] {
     log_info "Adding Mechanix package sources to sources.list"
 
     # Add SSL bypass configuration before adding sources
-    let ssl_bypass_conf = `
-Acquire::https::Verify-Peer "false";
-Acquire::https::Verify-Host "false";
-APT::Get::AllowUnauthenticated "true";
-`
-    sudo chroot $rootfs_dir bash -c $"echo '($ssl_bypass_conf)' > /etc/apt/apt.conf.d/99-ssl-bypass"
+    log_debug "Adding SSL bypass configuration"
+    sudo chroot $rootfs_dir bash -c "echo 'Acquire::https::Verify-Peer \"false\";' > /etc/apt/apt.conf.d/99-ssl-bypass"
+    sudo chroot $rootfs_dir bash -c "echo 'Acquire::https::Verify-Host \"false\";' >> /etc/apt/apt.conf.d/99-ssl-bypass"
+    sudo chroot $rootfs_dir bash -c "echo 'APT::Get::AllowUnauthenticated \"true\";' >> /etc/apt/apt.conf.d/99-ssl-bypass"
     log_debug "Added SSL bypass configuration"
 
     # Iterate through each source and add it to sources.list
