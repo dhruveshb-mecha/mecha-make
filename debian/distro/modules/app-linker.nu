@@ -19,36 +19,35 @@ export def configure_app_linking [] {
     # Build paths using your approach
     let rootfs_dir = $rootfs_dir | path expand
     
-    # Check if patchelf is available
-    try {
-        which patchelf | complete
-    } catch {
-        log_error "patchelf not found. Install it with: sudo apt install patchelf"
-        return
+    # Check if patchelf is available on HOST, install if missing
+    let patchelf_check = (which patchelf | complete)
+    if $patchelf_check.exit_code != 0 {
+        log_info "patchelf not found on host, installing it..."
+        try {
+            sudo apt-get update -qq
+            sudo apt-get install -y patchelf
+            log_info "Successfully installed patchelf on host"
+        } catch {
+            log_error "Failed to install patchelf on host"
+            return
+        }
     }
     
-    # Use chroot to execute commands in the target environment
-    alias CHROOT = sudo chroot $rootfs_dir
-    
-    # Process each app
+    # Process each app using HOST patchelf
     for app in ($apps | transpose key value) {
         let bin_name = $app.key
         let lib_dir = $app.value
-        let bin_path = $"/usr/bin/($bin_name)"
-        let full_bin_path = $rootfs_dir + $bin_path
+        let full_bin_path = $rootfs_dir + $"/usr/bin/($bin_name)"
         let full_lib_path = $rootfs_dir + $lib_dir
         
         log_debug $"Processing ($bin_name)..."
-        log_debug $"Binary path: ($full_bin_path)"
-        log_debug $"Library path: ($full_lib_path)"
         
         # Check if binary and lib directory exist
         if ($full_bin_path | path exists) and ($full_lib_path | path exists) {
             log_debug $"👉 Patching ($bin_name) to use ($lib_dir)"
             
             try {
-                # Use chroot environment to patch the binary
-                CHROOT patchelf --set-rpath $lib_dir $bin_path
+                patchelf --set-rpath $lib_dir $full_bin_path
                 log_info $"✅ Successfully patched ($bin_name)"
             } catch {
                 |error| log_error $"❌ Failed to patch ($bin_name): ($error)"
@@ -61,54 +60,6 @@ export def configure_app_linking [] {
                 log_debug $"⚠️ Lib directory not found: ($full_lib_path)"
             }
             log_debug $"⚠️ Skipping ($bin_name) (binary or libdir missing)"
-        }
-    }
-    
-    # Verify the configuration by running ldd and logging output
-    log_info "Verifying app linking configuration:"
-    for app in ($apps | transpose key value) {
-        let bin_name = $app.key
-        let bin_path = $"/usr/bin/($bin_name)"
-        let full_bin_path = $rootfs_dir + $bin_path
-        
-        if ($full_bin_path | path exists) {
-            log_info $"Checking RPATH for ($bin_name):"
-            
-            try {
-                let rpath_output = (CHROOT readelf -d $bin_path | complete)
-                if $rpath_output.exit_code == 0 {
-                    let rpath_lines = ($rpath_output.stdout | lines | where $it =~ "RPATH|RUNPATH")
-                    if ($rpath_lines | length) > 0 {
-                        for line in $rpath_lines {
-                            log_info $"  RPATH: ($line | str trim)"
-                        }
-                    } else {
-                        log_debug $"  No RPATH found for ($bin_name)"
-                    }
-                } else {
-                    log_debug $"  Failed to read RPATH for ($bin_name)"
-                }
-            } catch {
-                |error| log_debug $"  Could not check RPATH for ($bin_name): ($error)"
-            }
-            
-            # Also run ldd to show library dependencies
-            try {
-                let ldd_output = (CHROOT ldd $bin_path | complete)
-                if $ldd_output.exit_code == 0 {
-                    log_info $"Library dependencies for ($bin_name):"
-                    let ldd_lines = ($ldd_output.stdout | lines | first 10)  # Limit to first 10 lines
-                    for line in $ldd_lines {
-                        if ($line | str trim | str length) > 0 {
-                            log_info $"  ($line | str trim)"
-                        }
-                    }
-                } else {
-                    log_debug $"  Failed to run ldd for ($bin_name): ($ldd_output.stderr)"
-                }
-            } catch {
-                |error| log_debug $"  Could not run ldd for ($bin_name): ($error)"
-            }
         }
     }
     
