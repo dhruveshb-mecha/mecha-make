@@ -23,7 +23,6 @@ def install_package [name: string, url: string, sha] {
 export def install_host_packages [] {
     log_info "Installing host packages:"
 
-
     log_debug $"Number of packages found: (open $HOST_INSTALLATION_CONF | get packages | length)"
 
     open $HOST_INSTALLATION_CONF | get packages | each {|pkg| 
@@ -35,7 +34,6 @@ export def install_host_packages [] {
          
         }
     }
-
 }
 
 export def install_target_packages [] {
@@ -48,13 +46,13 @@ export def install_target_packages [] {
     log_info "Cleaning old apt cache..."
     CHROOT apt-get clean
 
-    # Retry apt-get update up to 3 times
+    # Retry apt-get update up to 3 times with SSL bypass
     log_info "Updating package lists..."
     let max_retries = 3
     mut retry = 0
     while ($retry < $max_retries) {
         log_debug $"Attempt ($retry + 1) for apt-get update"
-        CHROOT apt-get update -o Acquire::Retries=3
+        CHROOT apt-get update -o Acquire::Retries=3 -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false --allow-unauthenticated
         if $env.LAST_EXIT_CODE == 0 {
             log_info "apt-get update completed successfully"
             break
@@ -84,7 +82,7 @@ export def install_target_packages [] {
         for pkg in $pkg_group.packages {
             try {
                 log_debug $"Installing package: ($pkg)"
-                CHROOT apt-get -y --allow-change-held-packages install $pkg
+                CHROOT apt-get -y --allow-change-held-packages --allow-unauthenticated install $pkg
             } catch {|err| 
                 log_error $"Failed to install package ($pkg): ($err). Continuing..."
                 continue
@@ -94,7 +92,6 @@ export def install_target_packages [] {
 
     log_info "Target package installation complete."
 }
-
 
 export def add_debian_mechanix_source [] {
     let rootfs_dir = $env.ROOTFS_DIR
@@ -107,6 +104,15 @@ export def add_debian_mechanix_source [] {
     let deb_package_sources = open $build_conf_path | get apt | get sources
 
     log_info "Adding Mechanix package sources to sources.list"
+
+    # Add SSL bypass configuration before adding sources
+    let ssl_bypass_conf = `
+Acquire::https::Verify-Peer "false";
+Acquire::https::Verify-Host "false";
+APT::Get::AllowUnauthenticated "true";
+`
+    sudo chroot $rootfs_dir bash -c $"echo '($ssl_bypass_conf)' > /etc/apt/apt.conf.d/99-ssl-bypass"
+    log_debug "Added SSL bypass configuration"
 
     # Iterate through each source and add it to sources.list
     $deb_package_sources | each { |source|
@@ -123,16 +129,16 @@ export def add_debian_mechanix_source [] {
 
     log_info "Successfully added all Mechanix package sources"
 
-    # Update package lists with redirect-friendly settings
-    log_info "Updating package lists with redirect support"
+    # Update package lists with SSL bypass and redirect-friendly settings
+    log_info "Updating package lists with SSL bypass and redirect support"
     
     try {
-        CHROOT apt-get update
+        CHROOT apt-get update -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false --allow-unauthenticated
         log_info "Successfully updated package lists"
     } catch {
         log_warning "Standard update failed, trying with additional options"
         try {
-            CHROOT apt-get update --allow-releaseinfo-change -o Debug::Acquire::http=true
+            CHROOT apt-get update --allow-releaseinfo-change -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false --allow-unauthenticated -o Debug::Acquire::http=true
             log_info "Successfully updated package lists on second attempt"
         } catch {
             log_error "Failed to update package lists after multiple attempts"
