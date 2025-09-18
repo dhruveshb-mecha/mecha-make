@@ -20,8 +20,10 @@ export def configure_app_linking [] {
     let rootfs_dir = $rootfs_dir | path expand
     
     # Check if patchelf is available on HOST, install if missing
-    let patchelf_check = (which patchelf | complete)
-    if $patchelf_check.exit_code != 0 {
+    try {
+        which patchelf
+        log_debug "patchelf found on host"
+    } catch {
         log_info "patchelf not found on host, installing it..."
         try {
             sudo apt-get update -qq
