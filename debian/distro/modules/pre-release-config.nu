@@ -36,7 +36,7 @@ export def update_pre_release_assets [] {
 
     # Copy kernel modules (entire folder)
     sudo mkdir -p ($rootfs_dir + "/lib/modules")
-    sudo cp -r ($extracted_dir + "/6.12.20-gdfaf2136deb2-dirty") ($rootfs_dir + "/lib/modules/")
+    sudo cp -r ($extracted_dir + "/6.6.52+mecha+") ($rootfs_dir + "/lib/modules/")
     log_debug "Kernel modules updated in target rootfs."
 
     # Copy WiFi firmware (inner nxp folder only)

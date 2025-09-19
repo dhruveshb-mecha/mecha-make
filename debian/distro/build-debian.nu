@@ -78,7 +78,7 @@ def main [machine: string, build_dir: string] {
     
     add_debian_mechanix_source
     
-    boot_script 
+    #boot_script 
     
     install_target_packages      
 
