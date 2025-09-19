@@ -14,6 +14,7 @@ export def configure_app_linking [] {
         mechanix_files: "/usr/share/mechanix/mechanix-files-beta/lib"
         mechanix_notes: "/usr/share/mechanix/mechanix-notes-beta/lib" 
         mechanix_settings: "/usr/share/mechanix/mechanix-settings-beta/lib"
+        mechanix_music: "/usr/share/mechanix/mechanix-music-beta/lib"
     }
     
     # Build paths using your approach
