@@ -20,6 +20,9 @@ export def install_packages_in_directory [dir: string] {
         } else {
             log_info $"Successfully installed all packages."
         }
+        # One-time cleanup of apt cache, always run
+        log_debug "Cleaning apt cache..."
+        run-external "apt-get" "clean"
     } else {
         log_warn "No .deb files found to install."
     }
