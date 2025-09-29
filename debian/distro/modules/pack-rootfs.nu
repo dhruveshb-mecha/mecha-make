@@ -11,6 +11,9 @@ export def pack_root_fs [] {
   let rootfs_dir = $env.ROOTFS_DIR
   let deploy_dir = $env.DEPLOY_DIR
 
+  log_debug "Cleaning apt cache..."
+  SUDO chroot $rootfs_dir apt-get clean
+
   log_debug $"Rootfs Directory: ($rootfs_dir)"
   log_debug $"Deploy Directory: ($deploy_dir)"
 

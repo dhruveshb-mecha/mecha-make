@@ -82,7 +82,7 @@ export def install_target_packages [] {
         for pkg in $pkg_group.packages {
             try {
                 log_debug $"Installing package: ($pkg)"
-                CHROOT apt-get -y --allow-change-held-packages --allow-unauthenticated install $pkg
+                CHROOT apt-get -y  --no-install-recommends --allow-change-held-packages --allow-unauthenticated install $pkg
             } catch {|err| 
                 log_error $"Failed to install package ($pkg): ($err). Continuing..."
                 continue
@@ -91,6 +91,9 @@ export def install_target_packages [] {
     }
 
     log_info "Target package installation complete."
+    # One-time cleanup
+    log_info "Cleaning apt cache after package installation..."
+    CHROOT apt-get clean
 }
 
 export def add_debian_mechanix_source [] {
