@@ -14,15 +14,7 @@ export def pack_root_fs [] {
   log_debug "Cleaning apt cache..."
   SUDO chroot $rootfs_dir apt-get clean
 
-  # 2. Remove /tmp contents
-  log_debug "Removing temporary files..."
-  let tmp_dir = $rootfs_dir + "/tmp"
-  SUDO rm -rf $tmp_dir/*
 
-  # 3. Remove logs
-  log_debug "Removing log files..."
-  let log_dir = $rootfs_dir + "/var/log"
-  SUDO rm -rf $log_dir/*
 
   log_debug $"Rootfs Directory: ($rootfs_dir)"
   log_debug $"Deploy Directory: ($deploy_dir)"
