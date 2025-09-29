@@ -11,6 +11,17 @@ export def pack_root_fs [] {
   let rootfs_dir = $env.ROOTFS_DIR
   let deploy_dir = $env.DEPLOY_DIR
 
+  log_debug "Cleaning apt cache..."
+  SUDO chroot $rootfs_dir apt-get clean
+
+  # 2. Remove /tmp contents
+  log_debug "Removing temporary files..."
+  SUDO rm -rf $rootfs_dir/tmp/*
+
+  # 3. Remove logs
+  log_debug "Removing log files..."
+  SUDO rm -rf $rootfs_dir/var/log/*
+
   log_debug $"Rootfs Directory: ($rootfs_dir)"
   log_debug $"Deploy Directory: ($deploy_dir)"
 
