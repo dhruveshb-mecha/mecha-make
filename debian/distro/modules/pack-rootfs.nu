@@ -14,8 +14,6 @@ export def pack_root_fs [] {
   log_debug "Cleaning apt cache..."
   SUDO chroot $rootfs_dir apt-get clean
 
-
-
   log_debug $"Rootfs Directory: ($rootfs_dir)"
   log_debug $"Deploy Directory: ($deploy_dir)"
 
