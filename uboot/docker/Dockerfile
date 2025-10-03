@@ -3,7 +3,7 @@ FROM ubuntu:22.04
 
 # Copy all files from the uboot directory except those in .dockerignore
 COPY ../uboot /uboot/
-COPY ../machine /machine/
+
 
 # Set the working directory inside the container
 WORKDIR /uboot

@@ -3,7 +3,6 @@ FROM ubuntu:22.04
 
 # Copy all files from the debian directory except those in .dockerignore
 COPY ../debian /debian/
-COPY ../machine /machine/
 COPY ../kernel /kernel/
 
 # Set the working directory inside the container

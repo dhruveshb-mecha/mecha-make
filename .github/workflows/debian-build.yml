@@ -1,4 +1,4 @@
-name: Debian Build
+name: Mechanix OS (apollo 25.10, debian 13)
 
 on:
   schedule:
@@ -24,6 +24,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set build date
+        id: set-date
+        run: echo "date=$(date +%Y%m%d)" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -69,6 +73,11 @@ jobs:
         run: |
           docker exec distro-container ls -R /
 
+      - name: Rename artifact with date
+        run: |
+          DATE=${{ steps.set-date.outputs.date }}
+          mv ./artifacts/debian-image-rootfs.tar.gz ./artifacts/mechanix-os-apollo-25.10-${DATE}-mecha-comet-gen1.rootfs.tar.gz
+
       - name: list artifacts
         run: |
           ls -R ./artifacts || echo "No artifacts found"
@@ -82,5 +91,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: debian-image-rootfs.tar.gz 
+          name: mechanix-os-apollo-25.10-${{ steps.set-date.outputs.date }}-mecha-comet-gen1.rootfs.tar.gz
           path: ./artifacts/*

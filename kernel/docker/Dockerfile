@@ -3,7 +3,6 @@ FROM ubuntu:22.04
 
 # Copy all files from the bootloader directory except those in .dockerignore
 COPY ../kernel /kernel/
-COPY ../machine /machine/
 
 # Set the working directory inside the container
 WORKDIR /kernel
@@ -16,20 +15,8 @@ RUN apt-get update && \
     git \
     rsync \
     cpio
-    # wget \
-    # build-essential \
-    # gcc-aarch64-linux-gnu \
-    # bison \
-    # flex \
-    # libssl-dev \
-    # libncurses-dev \
-    # uuid-dev \
-    # libgnutls28-dev \
-    # git \
-    # zlib1g-dev \
-    # device-tree-compiler
 
-# install ssh key 
+# install ssh key
 RUN mkdir -p /root/.ssh
 COPY id_rsa /root/.ssh/id_rsa
 # COPY id_rsa.pub /root/.ssh/id_rsa.pub
