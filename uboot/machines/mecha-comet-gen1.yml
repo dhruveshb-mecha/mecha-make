@@ -1,4 +1,4 @@
-src: "https://github.com/chiragp-mecha/u-boot/archive/refs/heads/imx-2023.04.y.tar.gz"
+src: "https://github.com/mecha-org/u-boot/archive/refs/heads/imx-2023.04.y.zip"
 rev: "1.0" # commit id or tag
 version: "1.0"
 flags: 
