@@ -1,4 +1,4 @@
-name: Fedora Build
+name: Mechanix OS (apollo 24.10, fedora)
 
 on:
   push:
