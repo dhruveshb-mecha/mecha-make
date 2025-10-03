@@ -3,7 +3,7 @@ FROM fedora:42
 
 # Copy all files from the fedora directory except those in .dockerignore
 COPY ../fedora /fedora/
-COPY ../machine /machine/
+
 COPY ../kernel /kernel/
 
 # Set the working directory inside the container
