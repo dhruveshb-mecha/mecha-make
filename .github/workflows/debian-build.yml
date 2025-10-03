@@ -1,4 +1,4 @@
-name: Mechanix OS (apollo 24.10, debian 13)
+name: Mechanix OS (apollo 25.10, debian 13)
 
 on:
   schedule:
@@ -76,7 +76,7 @@ jobs:
       - name: Rename artifact with date
         run: |
           DATE=${{ steps.set-date.outputs.date }}
-          mv ./artifacts/debian-image-rootfs.tar.gz ./artifacts/mechanix-os-apollo-24.10-${DATE}-mecha-comet-gen1.rootfs.tar.gz
+          mv ./artifacts/debian-image-rootfs.tar.gz ./artifacts/mechanix-os-apollo-25.10-${DATE}-mecha-comet-gen1.rootfs.tar.gz
 
       - name: list artifacts
         run: |
@@ -91,5 +91,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: mechanix-os-apollo-24.10-${{ steps.set-date.outputs.date }}-mecha-comet-gen1.rootfs.tar.gz
+          name: mechanix-os-apollo-25.10-${{ steps.set-date.outputs.date }}-mecha-comet-gen1.rootfs.tar.gz
           path: ./artifacts/*

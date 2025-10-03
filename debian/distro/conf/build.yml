@@ -23,10 +23,10 @@ os-release:
   ID_LIKE:
     - debian
   NAME: Mechanix
-  VERSION: "24.10.0 LTS (Apollo)"
-  VERSION_ID: "24.10"
+  VERSION: "25.10.0 LTS (Apollo)"
+  VERSION_ID: "25.10"
   VERSION_CODENAME: Apollo
-  PRETTY_NAME: "Mechanix 24.10 LTS"
+  PRETTY_NAME: "Mechanix 25.10 LTS"
   HOME_URL: "https://mecha.so/"
   SUPPORT_URL: "https://forum.mecha.so/"
   BUG_REPORT_URL: "https://forum.mecha.so/"
