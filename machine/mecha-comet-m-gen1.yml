@@ -1,5 +1,5 @@
 u-boot:
-  url: "https://github.com/chiragp-mecha/u-boot/archive/refs/heads/imx-2023.04.y.tar.gz"
+  url: "https://github.com/mecha-org/u-boot/archive/refs/heads/imx-2023.04.y.zip"
   sha: ""
 
 imx-atf:
