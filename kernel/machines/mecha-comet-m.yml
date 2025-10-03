@@ -3,7 +3,7 @@ rev: imx-6.12.20 # last latest build -> head to be fatched
 version: imx-6.12.20 #kernel version to be applied for github release  => 6.1.1-mecha next release 6.1.2-mecha
 # flags for the build system any extra flags (or args) to pass to compiler like defconfig or any other it will be list of key pair values
 flags:
-  defconfig : "mecha_v8_defconfig"
+  defconfig : "defconfig"
   arch: "arm64"
   cross_compile: "aarch64-linux-gnu-"
   debian_frontend : "noninteractive"
