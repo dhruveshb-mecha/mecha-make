@@ -101,7 +101,7 @@ export def add_debian_mechanix_source [] {
     alias CHROOT = sudo chroot $rootfs_dir
 
     let sources_list_path = "/etc/apt/sources.list"
-    let trusted_gpg_dir = "/etc/apt/trusted.gpg.d"
+    let keyrings_dir = "/etc/apt/keyrings"
 
     # Get the package source from the YAML configuration
     let build_conf_path = $env.BUILD_CONF_PATH
@@ -109,26 +109,30 @@ export def add_debian_mechanix_source [] {
 
     log_info "Adding Mechanix package sources to sources.list"
 
-    # Ensure trusted.gpg.d directory exists
-    CHROOT mkdir -p $trusted_gpg_dir
+    # Ensure keyrings directory exists
+    CHROOT mkdir -p $keyrings_dir
 
     # Iterate through each source and add it to sources.list
     $deb_package_sources | each { |source|
-        let repo_url = if ($source | describe) == "record" { $source.url } else { $source }
-        let repo_key = if ($source | describe) == "record" { $source.key? } else { null }
+        let repo_url = $source.url
+        let repo_key = $source.key?
         
         # Download and add GPG key if provided
-        if $repo_key != null {
+        if $repo_key != null and $repo_key != "" {
             log_debug $"Downloading GPG key from: ($repo_key)"
-            let key_filename = ($repo_key | path basename)
+            let key_filename = ($repo_url | split row "/" | get 2 | str replace "." "-") + ".asc"
+            let key_path = $"($keyrings_dir)/($key_filename)"
             
-            # Download key directly into chroot
-            CHROOT wget -q $repo_key -O $"($trusted_gpg_dir)/($key_filename)"
+            # Download key directly into chroot keyrings directory
+            CHROOT curl -fsSL $repo_key -o $key_path
+            
+            # Set proper permissions
+            CHROOT chmod a+r $key_path
             
             log_info $"Added GPG key for ($repo_url)"
             
             # Add source with signed-by pointing to the key
-            let source_line = $"deb [signed-by=($trusted_gpg_dir)/($key_filename)] ($repo_url)"
+            let source_line = $"deb [signed-by=($key_path)] ($repo_url)"
             log_debug $"Adding source: ($source_line)"
             sudo chroot $rootfs_dir bash -c $"echo '($source_line)' >> ($sources_list_path)"
         } else {
