@@ -95,7 +95,6 @@ export def install_target_packages [] {
     log_info "Cleaning apt cache after package installation..."
     CHROOT apt-get clean
 }
-
 export def add_debian_mechanix_source [] {
     let rootfs_dir = $env.ROOTFS_DIR
     alias CHROOT = sudo chroot $rootfs_dir
@@ -126,19 +125,22 @@ export def add_debian_mechanix_source [] {
             
             log_info $"Added GPG key for ($repo_url)"
             
-            # Add source with signed-by pointing to the key
-            let source_line = $"deb [signed-by=($keyrings_dir)/comet.gpg] ($repo_url)"
+            # Add source with signed-by pointing to the key (with newline)
+            let source_line = $"deb [signed-by=($keyrings_dir)/comet.gpg] ($repo_url)\n"
             log_debug $"Adding source: ($source_line)"
-            $source_line | CHROOT tee -a $sources_list_path > /dev/null
+            printf $source_line | CHROOT tee -a $sources_list_path > /dev/null
         } else {
-            # No key provided, add with trusted=yes
-            let source_line = $"deb [trusted=yes] ($repo_url)"
+            # No key provided, add with trusted=yes (with newline)
+            let source_line = $"deb [trusted=yes] ($repo_url)\n"
             log_debug $"Adding source: ($source_line)"
-            $source_line | CHROOT tee -a $sources_list_path > /dev/null
+            printf $source_line | CHROOT tee -a $sources_list_path > /dev/null
         }
     }
 
     log_info "Successfully added all Mechanix package sources"
+
+    log_debug "Verifying contents of sources.list:"
+    CHROOT cat $sources_list_path
 
     # Update package lists
     log_info "Updating package lists"
