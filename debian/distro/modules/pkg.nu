@@ -101,6 +101,7 @@ export def add_debian_mechanix_source [] {
     alias CHROOT = sudo chroot $rootfs_dir
 
     let sources_list_path = "/etc/apt/sources.list"
+    let trusted_gpg_dir = "/etc/apt/trusted.gpg.d"
 
     # Get the package source from the YAML configuration
     let build_conf_path = $env.BUILD_CONF_PATH
@@ -108,48 +109,50 @@ export def add_debian_mechanix_source [] {
 
     log_info "Adding Mechanix package sources to sources.list"
 
-    # Add SSL bypass configuration before adding sources
-    log_debug "Adding SSL bypass configuration"
-    sudo chroot $rootfs_dir bash -c "echo 'Acquire::https::Verify-Peer \"false\";' > /etc/apt/apt.conf.d/99-ssl-bypass"
-    sudo chroot $rootfs_dir bash -c "echo 'Acquire::https::Verify-Host \"false\";' >> /etc/apt/apt.conf.d/99-ssl-bypass"
-    sudo chroot $rootfs_dir bash -c "echo 'APT::Get::AllowUnauthenticated \"true\";' >> /etc/apt/apt.conf.d/99-ssl-bypass"
-    log_debug "Added SSL bypass configuration"
+    # Ensure trusted.gpg.d directory exists
+    CHROOT mkdir -p $trusted_gpg_dir
 
     # Iterate through each source and add it to sources.list
     $deb_package_sources | each { |source|
-        let source_line = $"deb [trusted=yes allow-insecure=yes allow-weak=yes allow-downgrade-to-insecure=yes] ($source)"
-        log_debug $"Adding source: ($source_line)"
+        let repo_url = if ($source | describe) == "record" { $source.url } else { $source }
+        let repo_key = if ($source | describe) == "record" { $source.key? } else { null }
         
-        sudo chroot $rootfs_dir bash -c $"echo '($source_line)' >> ($sources_list_path)"
+        # Download and add GPG key if provided
+        if $repo_key != null {
+            log_debug $"Downloading GPG key from: ($repo_key)"
+            let key_filename = ($repo_key | path basename)
+            
+            # Download key directly into chroot
+            CHROOT wget -q $repo_key -O $"($trusted_gpg_dir)/($key_filename)"
+            
+            log_info $"Added GPG key for ($repo_url)"
+            
+            # Add source with signed-by pointing to the key
+            let source_line = $"deb [signed-by=($trusted_gpg_dir)/($key_filename)] ($repo_url)"
+            log_debug $"Adding source: ($source_line)"
+            sudo chroot $rootfs_dir bash -c $"echo '($source_line)' >> ($sources_list_path)"
+        } else {
+            # No key provided, add with trusted=yes
+            let source_line = $"deb [trusted=yes] ($repo_url)"
+            log_debug $"Adding source: ($source_line)"
+            sudo chroot $rootfs_dir bash -c $"echo '($source_line)' >> ($sources_list_path)"
+        }
 
         if $env.LAST_EXIT_CODE != 0 {
-            log_error $"Failed to add source: ($source_line)"
+            log_error $"Failed to add source: ($repo_url)"
             return
         }
     }
 
     log_info "Successfully added all Mechanix package sources"
 
-    # Update package lists with SSL bypass and redirect-friendly settings
-    log_info "Updating package lists with SSL bypass and redirect support"
+    # Update package lists
+    log_info "Updating package lists"
     
     try {
-        CHROOT apt-get update -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false --allow-unauthenticated
+        CHROOT apt-get update
         log_info "Successfully updated package lists"
     } catch {
-        log_warning "Standard update failed, trying with additional options"
-        try {
-            CHROOT apt-get update --allow-releaseinfo-change -o Acquire::https::Verify-Peer=false -o Acquire::https::Verify-Host=false --allow-unauthenticated -o Debug::Acquire::http=true
-            log_info "Successfully updated package lists on second attempt"
-        } catch {
-            log_error "Failed to update package lists after multiple attempts"
-            log_info "Continuing with available packages..."
-        }
-    }
-
-    if $env.LAST_EXIT_CODE == 0 {
-        log_info "Successfully updated package lists"
-    } else {
         log_error "Failed to update package lists"
     }
 }
