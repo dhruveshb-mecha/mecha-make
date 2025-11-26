@@ -124,7 +124,7 @@ export def add_debian_mechanix_source [] {
             let key_path = $"($keyrings_dir)/($key_filename)"
             
             # Download key directly into chroot keyrings directory
-            CHROOT curl -fsSL $repo_key -o $key_path
+            CHROOT wget -q $repo_key -O $key_path
             
             # Set proper permissions
             CHROOT chmod a+r $key_path
