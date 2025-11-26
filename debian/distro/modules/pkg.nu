@@ -120,31 +120,21 @@ export def add_debian_mechanix_source [] {
         # Download and add GPG key if provided
         if $repo_key != null and $repo_key != "" {
             log_debug $"Downloading GPG key from: ($repo_key)"
-            let key_filename = comet.asc
-            let key_path = $"($keyrings_dir)/($key_filename)"
             
-            # Download key directly into chroot keyrings directory
-            sudo curl -fsSL $repo_key -o $key_path
-            
-            # Set proper permissions
-            CHROOT chmod a+r $key_path
+            # Download key and convert to gpg format
+            curl -fsSL $repo_key | CHROOT gpg --dearmor -o $"($keyrings_dir)/comet.gpg"
             
             log_info $"Added GPG key for ($repo_url)"
             
             # Add source with signed-by pointing to the key
-            let source_line = $"deb [signed-by=($key_path)] ($repo_url)"
+            let source_line = $"deb [signed-by=($keyrings_dir)/comet.gpg] ($repo_url)"
             log_debug $"Adding source: ($source_line)"
-            sudo chroot $rootfs_dir bash -c $"echo '($source_line)' >> ($sources_list_path)"
+            $source_line | CHROOT tee -a $sources_list_path > /dev/null
         } else {
             # No key provided, add with trusted=yes
             let source_line = $"deb [trusted=yes] ($repo_url)"
             log_debug $"Adding source: ($source_line)"
-            sudo chroot $rootfs_dir bash -c $"echo '($source_line)' >> ($sources_list_path)"
-        }
-
-        if $env.LAST_EXIT_CODE != 0 {
-            log_error $"Failed to add source: ($repo_url)"
-            return
+            $source_line | CHROOT tee -a $sources_list_path > /dev/null
         }
     }
 
