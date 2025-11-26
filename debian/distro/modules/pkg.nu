@@ -120,11 +120,11 @@ export def add_debian_mechanix_source [] {
         # Download and add GPG key if provided
         if $repo_key != null and $repo_key != "" {
             log_debug $"Downloading GPG key from: ($repo_key)"
-            let key_filename = ($repo_url | split row "/" | get 2 | str replace "." "-") + ".asc"
+            let key_filename = comet.asc
             let key_path = $"($keyrings_dir)/($key_filename)"
             
             # Download key directly into chroot keyrings directory
-            CHROOT wget -q $repo_key -O $key_path
+            sudo curl -fsSL $repo_key -o $key_path
             
             # Set proper permissions
             CHROOT chmod a+r $key_path
