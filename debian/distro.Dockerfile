@@ -18,7 +18,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     gnupg \
     unzip \
     patchelf \
-    ntpdate \
+    ntpsec-ntpdate \
  && ntpdate pool.ntp.org \
  && update-ca-certificates
 
