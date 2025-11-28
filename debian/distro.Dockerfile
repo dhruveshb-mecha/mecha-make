@@ -18,8 +18,6 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     gnupg \
     unzip \
     patchelf \
-    ntpsec-ntpdate \
- && ntpdate pool.ntp.org \
  && update-ca-certificates
 
 # Install Nushell
