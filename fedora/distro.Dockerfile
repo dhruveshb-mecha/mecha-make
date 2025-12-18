@@ -1,5 +1,5 @@
 # Use Debian Bookworm as the base image
-FROM fedora:42
+FROM fedora:latest
 
 # Set non-interactive frontend for dnf
 ENV DNF_FLAGS="--setopt=install_weak_dependencies=False"

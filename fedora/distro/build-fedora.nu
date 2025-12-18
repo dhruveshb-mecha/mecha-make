@@ -76,7 +76,7 @@ def main [machine: string, build_dir: string] {
 
     add_fedora_mechanix_repo
 
-    boot_script
+    boot_config
 
     install_target_packages
 

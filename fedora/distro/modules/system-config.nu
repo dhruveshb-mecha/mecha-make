@@ -64,7 +64,6 @@ export def configure_sys_files [] {
 
   log_debug "Configuring system files completed successfully."
 
-
 }
 
 export def configure_greeter [] {

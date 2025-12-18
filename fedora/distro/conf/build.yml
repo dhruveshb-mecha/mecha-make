@@ -11,12 +11,12 @@ ssh:
   host_ca:
   authorized_keys: []
   is_password_authentication_disabled: false
-fedora:
-  version: 42
-  name: Adams
-  release: 42
-  codename: adams
-  arch: aarch64
+# fedora:
+#   version: 42
+#   name: Adams
+#   release: 42
+#   codename: adams
+#   arch: aarch64
 
 keyboard-config:
   layout : "us"

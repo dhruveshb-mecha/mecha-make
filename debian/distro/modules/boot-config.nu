@@ -77,3 +77,16 @@ export def boot_script [] {
 
 }
 
+export def boot_config [rootfs_dir: string] {
+  log_info "Configuring boot settings:"
+
+  # we need to move boot files from  ./include/boot to the rootfs boot directory
+
+  let boot_source = (open $build_conf_path | get include-path) | path expand
+  let boot_source_dir = $boot_source + "/boot"
+  let boot_dest_dir = $rootfs_dir + "/boot"
+  alias SUDO = sudo
+
+  SUDO cp -r $boot_source_dir/* $boot_dest_dir/
+}
+
