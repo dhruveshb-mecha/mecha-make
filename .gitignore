@@ -1,2 +1,3 @@
-uboot/include/boot.scr
-
+boot*
+mkosi.extra*
+fedora43*
