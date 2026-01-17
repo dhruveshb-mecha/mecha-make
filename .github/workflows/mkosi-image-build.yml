@@ -1,0 +1,88 @@
+name: Fedora 43 mkosi Image Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 2 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+
+    container:
+      image: fedora:43
+      options: --privileged
+
+    env:
+      MKOSI_OUTPUT: fedora43.raw
+      IMAGE_PREFIX: mechanix-os
+
+    steps:
+      # 1. Checkout repo 
+      - name: Checkout mkosi-mecha
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 2. Install prerequisites
+      - name: Install build dependencies
+        run: |
+          set -euxo pipefail
+          dnf -y update
+          dnf -y install \
+            mkosi \
+            systemd \
+            systemd-repart \
+            git \
+            wget \
+            util-linux \
+            e2fsprogs \
+            dosfstools \
+            squashfs-tools \
+            xz \
+            tar
+
+      # 3. Cache DNF packages
+      - name: Cache DNF
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/dnf
+          key: dnf-${{ runner.os }}-${{ hashFiles('mkosi.conf') }}
+          restore-keys: |
+            dnf-${{ runner.os }}-
+
+      # 4. Download custom RPMs
+      - name: Fetch custom kernel & firmware
+        run: |
+          set -euxo pipefail
+          mkdir -p rpms
+          wget -O rpms/kernel.rpm \
+            https://pub-a2f44c787cec4290833312e57fd59522.r2.dev/kernel-6.12.20%2Bmecha%2B-2.aarch64.rpm
+          wget -O rpms/firmware.rpm \
+            https://pub-a2f44c787cec4290833312e57fd59522.r2.dev/firmware-nxp-wifi-nxpiw612.fc43.aarch64.rpm
+
+      # 5. Build image
+      - name: Build image with mkosi
+        run: |
+          set -euxo pipefail
+          mkosi -f build
+          test -f "${MKOSI_OUTPUT}"
+
+      # 6. Rename image with metadata
+      - name: Rename image
+        run: |
+          set -euxo pipefail
+          TS=$(date -u +"%Y%m%d-%H%M")
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          FINAL_NAME="${IMAGE_PREFIX}-${TS}-${SHORT_SHA}.raw"
+          mv "${MKOSI_OUTPUT}" "${FINAL_NAME}"
+          echo "IMAGE_NAME=${FINAL_NAME}" >> $GITHUB_ENV
+
+      # 7. Upload artifact
+      - name: Upload mkosi image
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.IMAGE_NAME }}
+          path: ${{ env.IMAGE_NAME }}
