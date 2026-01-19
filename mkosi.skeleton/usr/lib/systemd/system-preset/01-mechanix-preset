@@ -1,0 +1,4 @@
+enable mechanix-system-service.service
+enable mechanix-session-service.service
+enable mxsearch.service
+mxconf.service
