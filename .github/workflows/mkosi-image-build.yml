@@ -57,8 +57,7 @@ jobs:
       - name: Fetch custom kernel & firmware
         run: |
           set -euxo pipefail
-          mkdir -p /opt/mecha
-          cd /opt/mecha
+          cd mkosi.packages
           wget https://pub-a2f44c787cec4290833312e57fd59522.r2.dev/kernel-6.12.20%2Bmecha%2B-2.aarch64.rpm
           wget https://pub-a2f44c787cec4290833312e57fd59522.r2.dev/firmware-nxp-wifi-nxpiw612.fc43.aarch64.rpm
 
