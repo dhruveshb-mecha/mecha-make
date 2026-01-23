@@ -13,6 +13,8 @@ echo "$USERNAME:$PASSWORD" | chpasswd
 # Add the user to the 'wheel' group for sudo privileges
 usermod -aG wheel "$USERNAME"
 
+glib-compile-schemas /usr/share/glib-2.0/schemas/
+
 # Optional: allow wheel group to use sudo without password
 # Uncomment if you want passwordless sudo
 # echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
