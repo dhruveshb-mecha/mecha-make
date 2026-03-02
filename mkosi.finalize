@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+# Clear out existing entries, we don't want mkosi generated entries
+rm -f $BUILDROOT/boot/loader/entries/*
+
+# Remove kernel and other stuff added by the packaging,
+# we will use kernel-install hooks to add content
+rm -rf $BUILDROOT/boot/dtb-*
+rm -rf $BUILDROOT/boot/System.map-*
+rm -rf $BUILDROOT/boot/config-*
+rm -rf $BUILDROOT/boot/vmlinuz-*
+
+# Run kernel-install to let it configure entries
+
