@@ -9,7 +9,10 @@ PASSWORD="mecha"
 if ! id "$USERNAME" &>/dev/null; then
     useradd -m -s /bin/bash "$USERNAME"
     echo "$USERNAME:$PASSWORD" | chpasswd
-    usermod -aG sudo "$USERNAME"
+    usermod -aG sudo,video,render,input,audio,netdev,plugdev "$USERNAME"
+else
+    # Ensure existing user has correct groups
+    usermod -aG sudo,video,render,input,audio,netdev,plugdev "$USERNAME"
 fi
 
 # Ensure home directory permissions
@@ -81,4 +84,5 @@ export LC_ALL=en_US.UTF-8
 # Enable SDDM display manager for KDE Plasma
 if systemctl list-unit-files | grep -q sddm.service; then
     systemctl enable sddm
+    systemctl set-default graphical.target
 fi
