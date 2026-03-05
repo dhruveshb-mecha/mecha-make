@@ -13,6 +13,16 @@ echo "$USERNAME:$PASSWORD" | chpasswd
 # Add the user to the 'sudo' group for sudo privileges
 usermod -aG sudo "$USERNAME"
 
+# Configure systemd-logind to ignore power key
+mkdir -p /etc/systemd
+cat > /etc/systemd/logind.conf <<EOF
+[Login]
+HandlePowerKey=ignore
+EOF
+
+# Ensure the logind.conf has correct permissions
+chmod 644 /etc/systemd/logind.conf
+
 # Optional: allow sudo group to use sudo without password
 # Uncomment if you want passwordless sudo
 # echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
