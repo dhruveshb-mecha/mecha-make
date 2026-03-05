@@ -35,19 +35,6 @@ if [ -d "/usr/lib/linux-image-$KVER" ] && [ ! -d "/usr/lib/modules/$KVER/dtb" ];
     mv "/usr/lib/linux-image-$KVER" "/usr/lib/modules/$KVER/dtb"
 fi
 
-# --- 4. Serial Console Autologin ---
-# This bypasses the login prompt specifically for the Mecha serial port (ttymxc1)
-mkdir -p /etc/systemd/system/serial-getty@ttymxc1.service.d/
-cat > /etc/systemd/system/serial-getty@ttymxc1.service.d/autologin.conf <<EOF
-[Service]
-ExecStart=
-ExecStart=-/sbin/agetty --autologin $USERNAME --noclear %I 115200 vt100
-EOF
-
-# Ensure mecha user home is correct
-mkdir -p "/home/$USERNAME"
-chown -R "$USERNAME:$USERNAME" "/home/$USERNAME"
-
 # Optional: allow sudo group to use sudo without password
 # Uncomment if you want passwordless sudo
 # echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
