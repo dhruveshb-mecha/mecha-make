@@ -1,3 +1,0 @@
-enable mechanix-session-service.service
-enable mxconf.service
-enable mxsearch.service
