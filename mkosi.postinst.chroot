@@ -1,94 +1,19 @@
 #!/bin/bash
 set -e
 
-# --- 1. User Configuration ---
-USERNAME=mecha
-PASSWORD="mecha"
+# --- mkosi.postinst.chroot Wrapper ---
+# This script executes all modules in the skeleton directory in numerical order.
 
-# Create user if it doesn't exist
-if ! id "$USERNAME" &>/dev/null; then
-    useradd -m -s /bin/bash "$USERNAME"
-    echo "$USERNAME:$PASSWORD" | chpasswd
-    usermod -aG sudo,video,render,input,audio,netdev,plugdev "$USERNAME"
+SCRIPT_DIR="/usr/local/lib/mkosi-postinst.d"
+
+if [ -d "$SCRIPT_DIR" ]; then
+    for script in "$SCRIPT_DIR"/*.sh; do
+        if [ -x "$script" ]; then
+            echo "--- Executing: $(basename "$script") ---"
+            "$script"
+        fi
+    done
 else
-    # Ensure existing user has correct groups
-    usermod -aG sudo,video,render,input,audio,netdev,plugdev "$USERNAME"
-fi
-
-# Ensure home directory permissions
-chown -R "$USERNAME:$USERNAME" "/home/$USERNAME"
-
-# --- 2. System Settings ---
-# Configure systemd-logind to ignore power key
-mkdir -p /etc/systemd
-cat > /etc/systemd/logind.conf <<EOF
-[Login]
-HandlePowerKey=ignore
-EOF
-chmod 644 /etc/systemd/logind.conf
-
-# --- 3. Kernel & Device Tree Fix ---
-# mkosi 26 expects DTBs in /usr/lib/modules/KVER/dtb/
-KVER="6.12.20+mecha+"
-mkdir -p "/usr/lib/modules/$KVER"
-
-# Move the directory from the Kali package location to the standard location
-# Use 'mv' instead of 'ln' so mkosi only sees ONE copy of the DTB
-if [ -d "/usr/lib/linux-image-$KVER" ] && [ ! -d "/usr/lib/modules/$KVER/dtb" ]; then
-    mv "/usr/lib/linux-image-$KVER" "/usr/lib/modules/$KVER/dtb"
-fi
-
-# --- 4. Networking Fixes ---
-# Fix sudo hostname resolution error
-if ! grep -q "127.0.1.1 comet" /etc/hosts; then
-    echo "127.0.1.1 comet" >> /etc/hosts
-fi
-
-# Create a default network configuration for all interfaces
-mkdir -p /etc/systemd/network
-cat > /etc/systemd/network/80-default.network <<EOF
-[Match]
-Name=en* eth*
-
-[Network]
-DHCP=yes
-EOF
-
-# Configure systemd-resolved with fallback DNS
-mkdir -p /etc/systemd/resolved.conf.d
-cat > /etc/systemd/resolved.conf.d/fallback.conf <<EOF
-[Resolve]
-FallbackDNS=8.8.8.8 8.8.4.4
-EOF
-
-# Enable systemd-resolved and set up the resolv.conf symlink
-systemctl enable systemd-resolved
-ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
-
-# Fix ping permissions for non-root users
-if [ -f /usr/bin/ping ]; then
-    chmod +s /usr/bin/ping
-fi
-
-# --- 5. Locale Configuration ---
-# Ensure standard locales are generated for proper tool behavior and error messages
-if [ -f /etc/locale.gen ]; then
-    # Uncomment C.UTF-8 if available or use en_US.UTF-8
-    sed -i 's/^# *\(en_US.UTF-8 UTF-8\)/\1/' /etc/locale.gen
-    locale-gen || true
-fi
-export LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
-
-# --- 6. GUI Configuration ---
-# Enable SDDM display manager for KDE Plasma
-if systemctl list-unit-files | grep -q sddm.service; then
-    # Force sddm as the default display manager
-    echo "/usr/bin/sddm" > /etc/X11/default-display-manager
-    
-    # Reload presets to catch the new 99-mecha.preset
-    systemctl preset sddm.service
-    
-    # Ensure graphical target is the default
-    systemctl set-default graphical.target
+    echo "Error: $SCRIPT_DIR not found inside chroot."
+    exit 1
 fi
