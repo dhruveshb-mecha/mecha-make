@@ -67,5 +67,12 @@ if [ -f /usr/bin/ping ]; then
     chmod +s /usr/bin/ping
 fi
 
-# Ensure sudo group to use sudo without password (uncomment if desired)
-# echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+# --- 5. Locale Configuration ---
+# Ensure standard locales are generated for proper tool behavior and error messages
+if [ -f /etc/locale.gen ]; then
+    # Uncomment C.UTF-8 if available or use en_US.UTF-8
+    sed -i 's/^# *\(en_US.UTF-8 UTF-8\)/\1/' /etc/locale.gen
+    locale-gen || true
+fi
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
