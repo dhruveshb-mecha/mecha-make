@@ -10,11 +10,9 @@ useradd -m -s /bin/bash "$USERNAME"
 # Set the user password
 echo "$USERNAME:$PASSWORD" | chpasswd
 
-# Add the user to the 'wheel' group for sudo privileges
-usermod -aG wheel "$USERNAME"
+# Add the user to the 'sudo' group for sudo privileges
+usermod -aG sudo "$USERNAME"
 
-glib-compile-schemas /usr/share/glib-2.0/schemas/
-
-# Optional: allow wheel group to use sudo without password
+# Optional: allow sudo group to use sudo without password
 # Uncomment if you want passwordless sudo
-# echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+# echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
