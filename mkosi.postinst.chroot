@@ -35,6 +35,16 @@ if [ -d "/usr/lib/linux-image-$KVER" ] && [ ! -d "/usr/lib/modules/$KVER/dtb" ];
     mv "/usr/lib/linux-image-$KVER" "/usr/lib/modules/$KVER/dtb"
 fi
 
+# --- 4. Networking Fixes ---
+# Fix sudo hostname resolution error
+if ! grep -q "127.0.1.1 comet" /etc/hosts; then
+    echo "127.0.1.1 comet" >> /etc/hosts
+fi
+
+# Enable systemd-resolved for DNS
+systemctl enable systemd-resolved
+ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+
 # Optional: allow sudo group to use sudo without password
 # Uncomment if you want passwordless sudo
 # echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
