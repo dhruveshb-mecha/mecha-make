@@ -83,6 +83,12 @@ export LC_ALL=en_US.UTF-8
 # --- 6. GUI Configuration ---
 # Enable SDDM display manager for KDE Plasma
 if systemctl list-unit-files | grep -q sddm.service; then
-    systemctl enable sddm
+    # Force sddm as the default display manager
+    echo "/usr/bin/sddm" > /etc/X11/default-display-manager
+    
+    # Reload presets to catch the new 99-mecha.preset
+    systemctl preset sddm.service
+    
+    # Ensure graphical target is the default
     systemctl set-default graphical.target
 fi
