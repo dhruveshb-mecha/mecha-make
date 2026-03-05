@@ -1,27 +1,52 @@
 #!/bin/bash
 set -e
 
+# --- 1. User Configuration ---
 USERNAME=mecha
 PASSWORD="mecha"
 
-# Create user with home directory and bash shell
-useradd -m -s /bin/bash "$USERNAME"
+# Create user if it doesn't exist
+if ! id "$USERNAME" &>/dev/null; then
+    useradd -m -s /bin/bash "$USERNAME"
+    echo "$USERNAME:$PASSWORD" | chpasswd
+    usermod -aG sudo "$USERNAME"
+fi
 
-# Set the user password
-echo "$USERNAME:$PASSWORD" | chpasswd
+# Ensure home directory permissions
+chown -R "$USERNAME:$USERNAME" "/home/$USERNAME"
 
-# Add the user to the 'sudo' group for sudo privileges
-usermod -aG sudo "$USERNAME"
-
+# --- 2. System Settings ---
 # Configure systemd-logind to ignore power key
 mkdir -p /etc/systemd
 cat > /etc/systemd/logind.conf <<EOF
 [Login]
 HandlePowerKey=ignore
 EOF
-
-# Ensure the logind.conf has correct permissions
 chmod 644 /etc/systemd/logind.conf
+
+# --- 3. Kernel & Device Tree Fix ---
+# mkosi 26 expects DTBs in /usr/lib/modules/KVER/dtb/
+KVER="6.12.20+mecha+"
+mkdir -p "/usr/lib/modules/$KVER"
+
+# Move the directory from the Kali package location to the standard location
+# Use 'mv' instead of 'ln' so mkosi only sees ONE copy of the DTB
+if [ -d "/usr/lib/linux-image-$KVER" ] && [ ! -d "/usr/lib/modules/$KVER/dtb" ]; then
+    mv "/usr/lib/linux-image-$KVER" "/usr/lib/modules/$KVER/dtb"
+fi
+
+# --- 4. Serial Console Autologin ---
+# This bypasses the login prompt specifically for the Mecha serial port (ttymxc1)
+mkdir -p /etc/systemd/system/serial-getty@ttymxc1.service.d/
+cat > /etc/systemd/system/serial-getty@ttymxc1.service.d/autologin.conf <<EOF
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty -o '-p -- \\u' --autologin $USERNAME --noclear %I 115200 vt100
+EOF
+
+# Ensure mecha user home is correct
+mkdir -p "/home/$USERNAME"
+chown -R "$USERNAME:$USERNAME" "/home/$USERNAME"
 
 # Optional: allow sudo group to use sudo without password
 # Uncomment if you want passwordless sudo
