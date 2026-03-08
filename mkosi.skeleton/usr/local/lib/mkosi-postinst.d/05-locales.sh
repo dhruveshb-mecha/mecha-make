@@ -11,4 +11,3 @@ fi
 
 # Set default locale for the system
 echo "LANG=en_US.UTF-8" > /etc/default/locale
-echo "LC_ALL=en_US.UTF-8" >> /etc/default/locale
