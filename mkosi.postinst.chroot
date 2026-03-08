@@ -6,6 +6,12 @@ set -e
 
 SCRIPT_DIR="/usr/local/lib/mkosi-postinst.d"
 
+# Only run if we are in the main image (initrd won't have /etc/kali_version)
+if [ ! -f /etc/kali_version ]; then
+    echo "--- Skipping modular postinst (initrd phase) ---"
+    exit 0
+fi
+
 if [ -d "$SCRIPT_DIR" ]; then
     for script in "$SCRIPT_DIR"/*.sh; do
         if [ -x "$script" ]; then
