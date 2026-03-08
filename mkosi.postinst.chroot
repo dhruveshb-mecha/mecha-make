@@ -4,10 +4,13 @@ set -e
 # --- mkosi.postinst.chroot Wrapper ---
 # This script executes all modules in the skeleton directory in numerical order.
 
+# Set a standard PATH for chroot operations
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
 SCRIPT_DIR="/usr/local/lib/mkosi-postinst.d"
 
-# Only run if we are in the main image (initrd won't have /etc/kali_version)
-if [ ! -f /etc/kali_version ]; then
+# Only run if we are in the main image phase (initrd won't have package managers)
+if [ ! -f /usr/bin/apt ] && [ ! -f /usr/bin/dpkg ]; then
     echo "--- Skipping modular postinst (initrd phase) ---"
     exit 0
 fi

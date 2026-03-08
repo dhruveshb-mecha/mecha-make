@@ -23,11 +23,12 @@ if [ -f /lib/systemd/system/sddm.service ] || [ -f /usr/lib/systemd/system/sddm.
     done
 
     # Force sddm as the default display manager
-    echo "/usr/bin/sddm" > /etc/X11/default-display-manager
+    mkdir -p /etc/X11
+    echo "/usr/bin/sddm" > /etc/X11/default-display-manager || true
     
     # Enable sddm service manually if needed
     if [ ! -L /etc/systemd/system/display-manager.service ]; then
-        ln -sf /lib/systemd/system/sddm.service /etc/systemd/system/display-manager.service
+        ln -sf /lib/systemd/system/sddm.service /etc/systemd/system/display-manager.service || true
     fi
 
     # Also try standard enablement
