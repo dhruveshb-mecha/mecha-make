@@ -22,6 +22,10 @@ if [ -d "$SCRIPT_DIR" ]; then
             "$script"
         fi
     done
+    
+    # Clean up build-only scripts after successful execution
+    echo "--- Cleaning up modular post-install scripts ---"
+    rm -rf "$SCRIPT_DIR"
 else
     echo "Error: $SCRIPT_DIR not found inside chroot."
     exit 1
