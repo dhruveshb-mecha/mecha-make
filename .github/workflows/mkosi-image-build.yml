@@ -58,6 +58,12 @@ jobs:
           ./venv/bin/pip install "git+https://github.com/systemd/mkosi.git@v26"
           echo "$(pwd)/venv/bin" >> $GITHUB_PATH
 
+      - name: Install Kali Keyring
+        run: |
+          set -euxo pipefail
+          wget http://http.kali.org/kali/pool/main/k/kali-archive-keyring/kali-archive-keyring_2025.1_all.deb
+          sudo apt-get install -y ./kali-archive-keyring_2025.1_all.deb
+
       - name: Fetch custom kernel
         run: |
           set -euxo pipefail
