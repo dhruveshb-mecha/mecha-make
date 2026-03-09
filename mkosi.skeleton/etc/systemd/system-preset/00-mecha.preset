@@ -1,3 +1,4 @@
 enable sddm.service
 enable avahi-daemon.service
 enable systemd-timesyncd.service
+enable ssh.service

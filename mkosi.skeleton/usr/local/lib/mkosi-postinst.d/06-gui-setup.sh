@@ -4,7 +4,7 @@ set -e
 echo "Configuring GUI session..."
 
 # Enable SDDM display manager for KDE Plasma
-if [ -f /lib/systemd/system/sddm.service ] || [ -f /usr/lib/systemd/system/sddm.service ]; then
+if [ -f /usr/lib/systemd/system/sddm.service ]; then
     # Unmask units that often cause 'preset-all' failures in Kali/KDE
     # Direct removal is more reliable in a chroot than 'systemctl unmask'
     for unit in \
@@ -25,15 +25,12 @@ if [ -f /lib/systemd/system/sddm.service ] || [ -f /usr/lib/systemd/system/sddm.
     # Force sddm as the default display manager
     mkdir -p /etc/X11
     echo "/usr/bin/sddm" > /etc/X11/default-display-manager || true
-    
-    # Enable sddm service manually if needed
+
+    # Enable sddm service manually if symlink missing (preset handles it, this is a guard)
     if [ ! -L /etc/systemd/system/display-manager.service ]; then
-        ln -sf /lib/systemd/system/sddm.service /etc/systemd/system/display-manager.service || true
+        ln -sf /usr/lib/systemd/system/sddm.service /etc/systemd/system/display-manager.service || true
     fi
 
-    # Also try standard enablement
-    systemctl enable sddm.service || true
-    
     # Ensure graphical target is the default
     systemctl set-default graphical.target || true
 fi

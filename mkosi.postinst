@@ -1,8 +1,0 @@
-#!/bin/bash
-set -e
-
-# mkosi.postinst (Host-side)
-# This script runs on the host during the build process.
-# Currently unused as all optimizations are inside the chroot.
-
-exit 0
