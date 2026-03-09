@@ -1,20 +1,31 @@
 #!/bin/bash
 set -e
 
-USERNAME=mecha
-PASSWORD="mecha"
+# --- mkosi.postinst.chroot Wrapper ---
+# This script executes all modules in the skeleton directory in numerical order.
 
-# Create user with home directory and bash shell
-useradd -m -s /bin/bash "$USERNAME"
+# Set a standard PATH for chroot operations
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
-# Set the user password
-echo "$USERNAME:$PASSWORD" | chpasswd
+SCRIPT_DIR="/usr/local/lib/mkosi-postinst.d"
 
-# Add the user to the 'wheel' group for sudo privileges
-usermod -aG wheel "$USERNAME"
+# Only run if we are in the main image phase (initrd won't have package managers)
+if [ ! -f /usr/bin/apt ] && [ ! -f /usr/bin/dpkg ]; then
+    echo "--- Skipping modular postinst (initrd phase) ---"
+    exit 0
+fi
 
-glib-compile-schemas /usr/share/glib-2.0/schemas/
-
-# Optional: allow wheel group to use sudo without password
-# Uncomment if you want passwordless sudo
-# echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+if [ -d "$SCRIPT_DIR" ]; then
+    for script in "$SCRIPT_DIR"/*.sh; do
+        if [ -x "$script" ]; then
+            echo "--- Executing: $(basename "$script") ---"
+            "$script"
+        fi
+    done
+    
+    # Clean up build-only scripts after successful execution
+    echo "--- Cleaning up modular post-install scripts ---"
+    rm -rf "$SCRIPT_DIR"
+else
+    echo "--- Modular postinst directory not found (likely already cleaned up) ---"
+fi
