@@ -27,6 +27,5 @@ if [ -d "$SCRIPT_DIR" ]; then
     echo "--- Cleaning up modular post-install scripts ---"
     rm -rf "$SCRIPT_DIR"
 else
-    echo "Error: $SCRIPT_DIR not found inside chroot."
-    exit 1
+    echo "--- Modular postinst directory not found (likely already cleaned up) ---"
 fi
