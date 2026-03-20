@@ -10,14 +10,27 @@ on:
 jobs:
   build:
     runs-on: ubuntu-24.04-arm
+    strategy:
+      fail-fast: false
+      matrix:
+        variant:
+          - name: plasma-mobile
+            mkosi_profile: ""
+            mkosi_output: fedora43.raw
+            artifact_prefix: plasma-mobile-os
+          - name: xfce
+            mkosi_profile: "--profile xfce"
+            mkosi_output: fedora43-xfce.raw
+            artifact_prefix: xfce-os
 
     container:
       image: fedora:43
       options: --privileged
 
     env:
-      MKOSI_OUTPUT: fedora43.raw
-      IMAGE_PREFIX: mechanix-os
+      MKOSI_OUTPUT: ${{ matrix.variant.mkosi_output }}
+      MKOSI_PROFILE: ${{ matrix.variant.mkosi_profile }}
+      IMAGE_PREFIX: ${{ matrix.variant.artifact_prefix }}
 
     steps:
       # 1. Checkout repo (instead of git clone)
@@ -49,8 +62,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /var/cache/dnf
-          key: dnf-${{ runner.os }}-${{ hashFiles('mkosi.conf') }}
+          key: dnf-${{ runner.os }}-${{ matrix.variant.name }}-${{ hashFiles('mkosi.conf', 'mkosi.conf.d/**', 'mkosi.profiles/**', 'mkosi.skeleton/**', 'mkosi.repart/**', 'mkosi.postinst', 'mkosi.postinst.chroot', 'mkosi.finalize') }}
           restore-keys: |
+            dnf-${{ runner.os }}-${{ matrix.variant.name }}-
             dnf-${{ runner.os }}-
 
       # 4. Download custom RPMs
@@ -66,7 +80,7 @@ jobs:
       - name: Build image with mkosi
         run: |
           set -euxo pipefail
-          mkosi -f build
+          mkosi ${MKOSI_PROFILE} -f build
           test -f "${MKOSI_OUTPUT}"
 
       # 6. Rename image with timestamp and upload
@@ -75,10 +89,10 @@ jobs:
           set -euxo pipefail
 
           TS=$(date -u +"%Y%m%d-%H%M")
-          FINAL_NAME="plasma-mobile-os-${TS}.raw"
+          FINAL_NAME="${IMAGE_PREFIX}-${TS}.raw"
 
           mkdir -p /opt/mecha
-          mv fedora43.raw /opt/mecha/${FINAL_NAME}
+          mv "${MKOSI_OUTPUT}" /opt/mecha/${FINAL_NAME}
 
           echo "IMAGE_NAME=${FINAL_NAME}" >> $GITHUB_ENV
 
