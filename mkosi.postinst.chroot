@@ -13,6 +13,35 @@ echo "$USERNAME:$PASSWORD" | chpasswd
 # Add the user to the 'wheel' group for sudo privileges
 usermod -aG wheel "$USERNAME"
 
+SESSION_DIR=/usr/share/wayland-sessions
+SDDM_SESSION=
+
+if [ -f "$SESSION_DIR/plasma-mobile.desktop" ]; then
+    SDDM_SESSION=plasma-mobile.desktop
+elif [ -f "$SESSION_DIR/plasmawayland.desktop" ]; then
+    SDDM_SESSION=plasmawayland.desktop
+elif [ -f /usr/share/xsessions/plasma.desktop ]; then
+    SDDM_SESSION=plasma.desktop
+else
+    echo "Unable to find a Plasma session desktop file for SDDM autologin" >&2
+    exit 1
+fi
+
+install -d /etc/sddm.conf.d
+cat > /etc/sddm.conf.d/10-autologin.conf <<EOF
+[Autologin]
+User=$USERNAME
+Session=$SDDM_SESSION
+
+[Users]
+RememberLastSession=false
+RememberLastUser=false
+EOF
+
+systemctl disable greetd.service >/dev/null 2>&1 || true
+systemctl enable sddm.service
+systemctl set-default graphical.target
+
 glib-compile-schemas /usr/share/glib-2.0/schemas/
 
 # Optional: allow wheel group to use sudo without password
