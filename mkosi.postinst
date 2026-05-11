@@ -1,9 +1,8 @@
 #!/bin/bash
 set -eux
 
-exit 0
-# enable the display manager
-# systemctl enable greetd
+# switch to graphical target so greetd (display manager) starts on boot
+systemctl set-default graphical.target
 
-# switch to graphical target
-#systemctl set-default graphical.target
+# enable seat management for Wayland compositors running as non-root
+systemctl enable seatd.service
