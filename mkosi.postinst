@@ -1,6 +1,2 @@
 #!/bin/bash
 set -eux
-
-# switch to graphical target so greetd (display manager) starts on boot
-mkdir -p /etc/systemd/system
-ln -sf /usr/lib/systemd/system/graphical.target /etc/systemd/system/default.target
