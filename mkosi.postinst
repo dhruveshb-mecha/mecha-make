@@ -1,6 +1,9 @@
 #!/bin/bash
 set -eux
 
+# Compile dconf database
+dconf update
+
 exit 0
 # enable the display manager
 # systemctl enable greetd

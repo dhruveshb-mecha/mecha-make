@@ -1,0 +1,11 @@
+# Disable lock screen
+[org/gnome/desktop/screensaver]
+lock-enabled=false
+
+# Disable auto-lock
+[org/gnome/desktop/session]
+idle-delay=uint32 0
+
+# Optional: disable screen blanking
+[org/gnome/settings-daemon/plugins/power]
+sleep-inactive-ac-timeout=0
