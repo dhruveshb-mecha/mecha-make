@@ -36,6 +36,7 @@ jobs:
             systemd \
             systemd-repart \
             git \
+            dconf \
             python3 \
             wget \
             util-linux \
