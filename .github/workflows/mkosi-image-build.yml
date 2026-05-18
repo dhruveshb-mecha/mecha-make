@@ -16,7 +16,7 @@ jobs:
       options: --privileged
 
     env:
-      MKOSI_OUTPUT: fedora44.raw
+      MKOSI_OUTPUT: fedora43.raw
       IMAGE_PREFIX: mechanix-os
 
     steps:
