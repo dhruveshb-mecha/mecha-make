@@ -15,6 +15,10 @@ usermod -aG wheel "$USERNAME"
 
 glib-compile-schemas /usr/share/glib-2.0/schemas/
 
+# Set the default timezone for the built image.
+ln -snf /usr/share/zoneinfo/Asia/Kolkata /etc/localtime
+echo "Asia/Kolkata" > /etc/timezone
+
 # Optional: allow wheel group to use sudo without password
 # Uncomment if you want passwordless sudo
 # echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
