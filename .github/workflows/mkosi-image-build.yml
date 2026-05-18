@@ -111,7 +111,7 @@ jobs:
           FINAL_NAME="mechanix-os-${TS}.raw"
 
           mkdir -p /opt/mecha
-          mv fedora44.raw /opt/mecha/${FINAL_NAME}
+          mv fedora43.raw /opt/mecha/${FINAL_NAME}
 
           echo "IMAGE_NAME=${FINAL_NAME}" >> $GITHUB_ENV
 
