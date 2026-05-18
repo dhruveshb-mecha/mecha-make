@@ -1,8 +1,12 @@
 #!/bin/bash
 set -eux
 
-# Compile dconf database
-dconf update
+# Compile dconf database if the tree exists.
+if [ -d /etc/dconf/db ]; then
+    dconf update
+else
+    echo "/etc/dconf/db missing; skipping dconf update"
+fi
 
 exit 0
 # enable the display manager
