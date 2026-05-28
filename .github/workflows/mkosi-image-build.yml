@@ -61,48 +61,7 @@ jobs:
           set -euxo pipefail
           cd mkosi.packages
           
-          # Fetch kernel from GitHub releases
-          KERNEL_URL="$(python3 - <<'PY'
-          import json
-          import re
-          import sys
-          import urllib.request
-
-          api_url = "https://api.github.com/repos/dhruveshb-mecha/linux/releases?per_page=10"
-          req = urllib.request.Request(
-              api_url,
-              headers={
-                  "Accept": "application/vnd.github+json",
-                  "User-Agent": "mecha-mkosi-image-build",
-              },
-          )
-
-          with urllib.request.urlopen(req) as response:
-              releases = json.load(response)
-
-          pattern = re.compile(r"^kernel-[0-9].*\.aarch64\.rpm$")
-          for release in releases:
-              if release.get("draft"):
-                  continue
-              for asset in release.get("assets", []):
-                  name = asset.get("name", "")
-                  if pattern.match(name):
-                      print(asset["browser_download_url"])
-                      sys.exit(0)
-
-          raise SystemExit("No published kernel RPM asset found in recent dhruveshb-mecha/linux releases")
-          PY
-          )"
-          
-          wget "$KERNEL_URL"
-          
-          # Compute and log SHA256 of kernel
-          KERNEL_FILE=$(ls kernel-*.aarch64.rpm)
-          KERNEL_SHA256=$(sha256sum "$KERNEL_FILE" | cut -d' ' -f1)
-          echo "Kernel: $KERNEL_FILE" | tee build-info.txt
-          echo "SHA256: $KERNEL_SHA256" | tee -a build-info.txt
-          echo "$KERNEL_SHA256  $KERNEL_FILE" > kernel-checksum.sha256
-          
+          wget https://pub-a2f44c787cec4290833312e57fd59522.r2.dev/kernel-6.12.20%2Bmecha-2.aarch64.rpm
           # Fetch firmware and squeekboard
           wget https://pub-a2f44c787cec4290833312e57fd59522.r2.dev/firmware-nxp-wifi-nxpiw612.fc43.aarch64.rpm
           wget https://pub-a2f44c787cec4290833312e57fd59522.r2.dev/squeekboard-1.43.1-2.fc42.aarch64.rpm
