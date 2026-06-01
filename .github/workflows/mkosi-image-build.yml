@@ -1,4 +1,4 @@
-name: Fedora 43 mkosi Image Build
+name: Fedora 44 mkosi Image Build
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-24.04-arm
 
     container:
-      image: fedora:43
+      image: fedora:44
       options: --privileged
 
     env:
@@ -91,8 +91,7 @@ jobs:
           PY
           )"
           wget "$KERNEL_URL"
-          wget https://pub-a2f44c787cec4290833312e57fd59522.r2.dev/firmware-nxp-wifi-nxpiw612.fc43.aarch64.rpm
-          wget https://pub-a2f44c787cec4290833312e57fd59522.r2.dev/squeekboard-1.43.1-2.fc42.aarch64.rpm
+          wget https://pub-a2f44c787cec4290833312e57fd59522.r2.dev/firmware-nxp-wifi-nxpiw612.fc43.aarch64.rpm          
 
       # 5. Build image
       - name: Build image with mkosi
