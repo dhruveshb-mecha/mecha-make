@@ -94,8 +94,9 @@ jobs:
           wget https://pub-a2f44c787cec4290833312e57fd59522.r2.dev/firmware-nxp-wifi-nxpiw612.fc43.aarch64.rpm
           wget https://pub-a2f44c787cec4290833312e57fd59522.r2.dev/squeekboard-1.43.1-2.fc42.aarch64.rpm
           wget https://pub-a2f44c787cec4290833312e57fd59522.r2.dev/chrome.tar
-          tar --wildcards --strip-components=1 -xvf chrome.tar 'aarch64/*.rpm'
+          tar --wildcards --strip-components=1 --exclude='aarch64/._*' -xvf chrome.tar 'aarch64/*.rpm'
           rm -f chrome.tar
+          rm -f ._*.rpm || true
 
       # 5. Build image
       - name: Build image with mkosi
