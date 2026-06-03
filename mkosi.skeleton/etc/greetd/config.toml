@@ -7,5 +7,6 @@ command = "agreety --cmd /bin/sh"
 user = "greetd"
 
 [initial_session]
-command = "phosh-session"
+command = "cage chromium-browser"
+#command = "phosh-session"
 user = "mecha"
