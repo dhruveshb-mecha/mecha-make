@@ -58,14 +58,17 @@ jobs:
       - name: Fetch custom kernel & firmware
         run: |
           set -euxo pipefail
+          mkdir -p mkosi.packages
           cd mkosi.packages
+          rm -f *.rpm
           KERNEL_URL="$(python3 - <<'PY'
           import json
           import re
           import sys
           import urllib.request
 
-          api_url = "https://api.github.com/repos/dhruveshb-mecha/linux/releases?per_page=10"
+          tag = "kernel-rpm-latest"
+          api_url = f"https://api.github.com/repos/dhruveshb-mecha/linux/releases/tags/{tag}"
           req = urllib.request.Request(
               api_url,
               headers={
@@ -75,23 +78,20 @@ jobs:
           )
 
           with urllib.request.urlopen(req) as response:
-              releases = json.load(response)
+              release = json.load(response)
 
           pattern = re.compile(r"^kernel-[0-9].*\.aarch64\.rpm$")
-          for release in releases:
-              if release.get("draft"):
-                  continue
-              for asset in release.get("assets", []):
-                  name = asset.get("name", "")
-                  if pattern.match(name):
-                      print(asset["browser_download_url"])
-                      sys.exit(0)
+          for asset in release.get("assets", []):
+              name = asset.get("name", "")
+              if pattern.match(name):
+                  print(asset["browser_download_url"])
+                  sys.exit(0)
 
-          raise SystemExit("No published kernel RPM asset found in recent dhruveshb-mecha/linux releases")
+          raise SystemExit(f"No kernel RPM asset found in release tag {tag}")
           PY
           )"
-          wget "$KERNEL_URL"
-          wget https://pub-a2f44c787cec4290833312e57fd59522.r2.dev/firmware-nxp-wifi-nxpiw612.fc43.aarch64.rpm          
+          wget -O "$(basename "$KERNEL_URL")" "$KERNEL_URL"
+          wget -O firmware-nxp-wifi-nxpiw612.fc43.aarch64.rpm https://pub-a2f44c787cec4290833312e57fd59522.r2.dev/firmware-nxp-wifi-nxpiw612.fc43.aarch64.rpm
 
       # 5. Build image
       - name: Build image with mkosi
