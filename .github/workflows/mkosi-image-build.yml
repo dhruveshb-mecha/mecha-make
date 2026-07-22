@@ -93,14 +93,28 @@ jobs:
           wget "$KERNEL_URL"
           wget https://pub-a2f44c787cec4290833312e57fd59522.r2.dev/firmware-nxp-wifi-nxpiw612.fc43.aarch64.rpm          
 
-      # 5. Build image
+      # 5. Configure the mecha user's password from a repo secret (never
+      # committed to git). Root has no password mechanism at all - see
+      # mkosi.conf. If CI_MECHA_USER_PASSWORD isn't configured, the build
+      # falls back to the secure default: the mecha user ships locked.
+      - name: Configure CI credentials
+        env:
+          CI_MECHA_USER_PASSWORD: ${{ secrets.CI_MECHA_USER_PASSWORD }}
+        run: |
+          set -euo pipefail
+          if [ -n "${CI_MECHA_USER_PASSWORD}" ]; then
+            printf 'MECHA_USER_PASSWORD=%s\n' "${CI_MECHA_USER_PASSWORD}" > mkosi.env
+            chmod 600 mkosi.env
+          fi
+
+      # 6. Build image
       - name: Build image with mkosi
         run: |
           set -euxo pipefail
           mkosi -f build
           test -f "${MKOSI_OUTPUT}"
 
-      # 6. Rename image with timestamp and upload
+      # 7. Rename image with timestamp and upload
       - name: Move image with timestamp
         run: |
           set -euxo pipefail

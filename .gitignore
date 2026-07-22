@@ -1,3 +1,9 @@
 boot*
 mkosi.extra*
 fedora43*
+
+# Local secrets / machine-specific overrides - never commit these.
+# See README.md "Credentials" section.
+mkosi.env
+mkosi.local.conf
+mkosi.local/

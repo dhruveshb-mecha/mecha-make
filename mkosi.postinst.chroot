@@ -2,13 +2,19 @@
 set -e
 
 USERNAME=mecha
-PASSWORD="mecha"
 
 # Create user with home directory and bash shell
 useradd -m -s /bin/bash "$USERNAME"
 
-# Set the user password
-echo "$USERNAME:$PASSWORD" | chpasswd
+# MECHA_USER_PASSWORD is picked up from mkosi.env (auto-loaded by mkosi into
+# the script environment, gitignored, see README.md "Credentials"). If it
+# isn't set, the account is left locked (no password) rather than falling
+# back to a known default - console autologin does not require a password.
+if [ -n "${MECHA_USER_PASSWORD:-}" ]; then
+    echo "$USERNAME:$MECHA_USER_PASSWORD" | chpasswd
+else
+    passwd -l "$USERNAME"
+fi
 
 # Add the user to the 'wheel' group for sudo privileges
 usermod -aG wheel "$USERNAME"
