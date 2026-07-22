@@ -6,6 +6,13 @@ Build system for creating custom Linux distributions and bootloaders for Mecha C
 
 This repository contains mkosi configuration and assets to build a reproducible Fedora-based image for the "mecha" project.
 
+Configuration layout:
+
+- `mkosi.conf` - distribution, output, and boot settings.
+- `mkosi.conf.d/` - package lists, split by category (base, hardware, desktop, multimedia, mechanix apps). Merged automatically with `mkosi.conf`.
+- `mkosi.profiles/` - opt-in variants selected with `--profile=<name>`, layered on top of the default build (see "Build" below).
+- `mkosi.version` - the image version, bumped with `mkosi bump` or `mkosi -B build` (`--auto-bump`).
+
 ## Prerequisites
 
 - Ubuntu/Debian (or other Linux host)
@@ -37,7 +44,15 @@ all administrative access goes through a regular sudo user instead.
 
 That user is `mecha` (created in `mkosi.postinst.chroot`, member of `wheel`).
 No password for it is committed to this repository either - by default it
-ships locked too (console autologin via `Autologin=yes` doesn't need one).
+ships locked too. This doesn't affect the Phosh session on the device
+screen, which greetd auto-starts as `mecha` regardless (see
+`mkosi.skeleton/etc/greetd/config.toml`).
+
+Separately, `Autologin=yes` in `mkosi.conf` is mkosi's own setting for
+passwordless **root** autologin on `tty1`/`hvc0`/nspawn's `pts/0` - i.e. an
+unauthenticated root shell on the physical/serial console. It's on by
+default for local development convenience; build with `--profile=release`
+(see "Build" below) to disable it.
 
 To set a password for local development or testing, create this gitignored
 file in the repo root before building:
@@ -64,6 +79,13 @@ Build the image using mkosi with the provided configuration:
 
 ```sh
 sudo mkosi -f build
+```
+
+For a build with root's tty1/serial-console autologin disabled, select the
+`release` profile:
+
+```sh
+sudo mkosi --profile=release -f build
 ```
 
 ## To validate the rootfs
