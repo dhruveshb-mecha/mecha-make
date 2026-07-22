@@ -1,4 +1,4 @@
-name: Fedora 44 mkosi Image Build
+name: Mechanix OS mkosi Image Build
 
 on:
   push:
@@ -16,7 +16,7 @@ jobs:
       options: --privileged
 
     env:
-      MKOSI_OUTPUT: fedora44.raw
+      MKOSI_OUTPUT: mechanix-os.raw
       IMAGE_PREFIX: mechanix-os
 
     steps:
@@ -50,7 +50,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /var/cache/dnf
-          key: dnf-${{ runner.os }}-${{ hashFiles('mkosi.conf') }}
+          key: dnf-${{ runner.os }}-${{ hashFiles('mkosi.conf', 'mkosi.conf.d/**') }}
           restore-keys: |
             dnf-${{ runner.os }}-
 
@@ -123,7 +123,7 @@ jobs:
           FINAL_NAME="mechanix-os-${TS}.raw"
 
           mkdir -p /opt/mecha
-          mv fedora44.raw /opt/mecha/${FINAL_NAME}
+          mv "${MKOSI_OUTPUT}" /opt/mecha/${FINAL_NAME}
 
           echo "IMAGE_NAME=${FINAL_NAME}" >> $GITHUB_ENV
 
