@@ -7,3 +7,4 @@ fedora43*
 mkosi.env
 mkosi.local.conf
 mkosi.local/
+mkosi.tools/*
