@@ -31,7 +31,11 @@ jobs:
       - name: Build qemu profile image
         run: |
           set -euxo pipefail
-          sudo "$HOME/.local/bin/mkosi" --profile=qemu -f build
+          # Resolve mkosi's actual path via PATH instead of guessing $HOME/.local/bin/mkosi - sudo
+          # resets PATH for the command it execs, so a bare `sudo mkosi`
+          # wouldn't find it either; resolving first sidesteps both.
+          MKOSI="$(command -v mkosi)"
+          sudo "$MKOSI" --profile=qemu -f build
           test -f mechanix-os-qemu.raw
           sudo chown "$(id -u):$(id -g)" mechanix-os-qemu.raw
 
