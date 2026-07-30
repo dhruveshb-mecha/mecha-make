@@ -12,32 +12,50 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # Same base as mkosi-image-build.yml: building this profile's Fedora
+    # tools tree (mkosi.conf's [Build] section) needs a working dnf/rpm
+    # somewhere to bootstrap from, which a plain ubuntu-latest runner has
+    # neither of.
+    container:
+      image: fedora:44
+      options: --privileged
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install build dependencies
+        run: |
+          set -euxo pipefail
+          dnf -y update
+          dnf -y install \
+            python3 \
+            pipx \
+            systemd \
+            systemd-repart \
+            git \
+            util-linux \
+            e2fsprogs \
+            dosfstools \
+            squashfs-tools \
+            xz \
+            tar
+
       # mkosi.conf relies on settings (ToolsTreeDistribution=, ToolsTreePackages=,
-      # QemuArgs=, Devicetrees=) that Fedora/apt-packaged mkosi releases don't
-      # have yet. Install the same git-main mkosi the config was developed
-      # against instead of a distro package.
+      # QemuArgs=, Devicetrees=) that Fedora 44's dnf-packaged mkosi (an
+      # earlier "26" snapshot) doesn't have yet, unlike the actual v26 git
+      # tag. Install from git instead of `dnf install mkosi`.
       - name: Install mkosi
         run: |
           set -euxo pipefail
-          sudo apt-get update
-          sudo apt-get install -y pipx
           pipx install git+https://github.com/systemd/mkosi.git
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Build qemu profile image
         run: |
           set -euxo pipefail
-          # Resolve mkosi's actual path via PATH instead of guessing $HOME/.local/bin/mkosi - sudo
-          # resets PATH for the command it execs, so a bare `sudo mkosi`
-          # wouldn't find it either; resolving first sidesteps both.
-          MKOSI="$(command -v mkosi)"
-          sudo "$MKOSI" --profile=qemu -f build
+          mkosi --profile=qemu -f build
           test -f mechanix-os-qemu.raw
-          sudo chown "$(id -u):$(id -g)" mechanix-os-qemu.raw
 
       - name: Upload image artifact
         if: always()
