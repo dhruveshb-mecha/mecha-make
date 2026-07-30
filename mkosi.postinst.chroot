@@ -29,6 +29,20 @@ echo "Asia/Kolkata" > /etc/timezone
 # Uncomment if you want passwordless sudo
 # echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
+# Stamp a per-build identifier into /etc/os-release so any built image can
+# be identified later (e.g. for bug reports): BUILD_ID is the standard
+# os-release(5) field for this (a timestamp is exactly what it's meant for,
+# per its own spec), and VARIANT/VARIANT_ID record which profile built it.
+# Both show up in `hostnamectl` and `cat /etc/os-release` with no extra
+# tooling needed - alongside IMAGE_ID/IMAGE_VERSION which mkosi already sets
+# from mkosi.conf's ImageId= and mkosi.version.
+VARIANT_ID="${PROFILES:-comet}"
+VARIANT_ID="${VARIANT_ID// /-}"
+{
+    echo "BUILD_ID=\"$(date -u +%Y%m%dT%H%M%SZ)\""
+    echo "VARIANT_ID=\"$VARIANT_ID\""    
+} >> /etc/os-release
+
 # phoc's packaged /usr/share/phosh/phoc.ini gives the "Virtual-1" output (the
 # DRM connector name paravirtualized GPUs like qemu's virtio-vga register as)
 # an arbitrary 720x1440@scale=2 placeholder. On the qemu profile, replace it
