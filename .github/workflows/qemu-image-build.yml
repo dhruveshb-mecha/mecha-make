@@ -39,7 +39,9 @@ jobs:
             dosfstools \
             squashfs-tools \
             xz \
-            tar
+            tar \
+            distribution-gpg-keys \
+            fedora-repos
 
       # mkosi.conf relies on settings (ToolsTreeDistribution=, ToolsTreePackages=,
       # QemuArgs=, Devicetrees=) that Fedora 44's dnf-packaged mkosi (an
