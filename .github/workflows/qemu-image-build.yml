@@ -1,0 +1,50 @@
+name: QEMU Test Image Build
+
+# Builds the x86-64 `qemu` profile image (phoc/phosh only, no Mechanix apps -
+# see README.md "Testing in QEMU") and uploads it as a workflow artifact, so
+# anyone with access to this repo's Actions runs can download and boot it
+# without setting up mkosi themselves.
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # mkosi.conf relies on settings (ToolsTreeDistribution=, ToolsTreePackages=,
+      # QemuArgs=, Devicetrees=) that Fedora/apt-packaged mkosi releases don't
+      # have yet. Install the same git-main mkosi the config was developed
+      # against instead of a distro package.
+      - name: Install mkosi
+        run: |
+          set -euxo pipefail
+          sudo apt-get update
+          sudo apt-get install -y pipx
+          pipx install git+https://github.com/systemd/mkosi.git
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Build qemu profile image
+        run: |
+          set -euxo pipefail
+          sudo "$HOME/.local/bin/mkosi" --profile=qemu -f build
+          test -f mechanix-os-qemu.raw
+          sudo chown "$(id -u):$(id -g)" mechanix-os-qemu.raw
+
+      - name: Upload image artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mechanix-os-qemu-raw
+          path: mechanix-os-qemu.raw
+
+      - name: Upload run script artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: run-qemu-standalone
+          path: run-qemu-standalone.sh
