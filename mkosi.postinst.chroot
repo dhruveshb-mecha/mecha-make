@@ -29,18 +29,26 @@ echo "Asia/Kolkata" > /etc/timezone
 # Uncomment if you want passwordless sudo
 # echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-# Stamp a per-build identifier into /etc/os-release so any built image can
-# be identified later (e.g. for bug reports): BUILD_ID is the standard
-# os-release(5) field for this (a timestamp is exactly what it's meant for,
-# per its own spec), and VARIANT/VARIANT_ID record which profile built it.
-# Both show up in `hostnamectl` and `cat /etc/os-release` with no extra
-# tooling needed - alongside IMAGE_ID/IMAGE_VERSION which mkosi already sets
-# from mkosi.conf's ImageId= and mkosi.version.
+# Stamp per-build identifiers into /etc/os-release (Fedora's own fields are
+# left as-is - these are added on top, not a replacement) so any built image
+# can be traced back later (e.g. for bug reports):
+# - IMAGE_VERSION is the standard os-release(5) field for this (mkosi
+#   auto-adds IMAGE_ID from ImageId=, but not this one). Comes from
+#   mkosi.version, or CI's --image-version= override (see
+#   mkosi-image-build.yml) - CI names the uploaded artifact after that same
+#   value, so the two can never drift apart.
+# - BUILD_ID is the source commit this image was built from - set via CI's
+#   --environment=MECHA_COMMIT_SHA=. Left out on local builds (no CI to set
+#   it), rather than stamping a misleading value.
+# - VARIANT_ID records which profile(s) built it.
 VARIANT_ID="${PROFILES:-comet}"
 VARIANT_ID="${VARIANT_ID// /-}"
 {
-    echo "BUILD_ID=\"$(date -u +%Y%m%dT%H%M%SZ)\""
-    echo "VARIANT_ID=\"$VARIANT_ID\""    
+    echo "IMAGE_VERSION=\"$IMAGE_VERSION\""
+    if [ -n "${MECHA_COMMIT_SHA:-}" ]; then
+        echo "BUILD_ID=\"$MECHA_COMMIT_SHA\""
+    fi
+    echo "VARIANT_ID=\"$VARIANT_ID\""
 } >> /etc/os-release
 
 # phoc's packaged /usr/share/phosh/phoc.ini gives the "Virtual-1" output (the
