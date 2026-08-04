@@ -43,10 +43,11 @@ jobs:
             distribution-gpg-keys \
             fedora-repos
 
-      # mkosi.conf relies on settings (ToolsTreeDistribution=, ToolsTreePackages=,
-      # QemuArgs=, Devicetrees=) that Fedora 44's dnf-packaged mkosi (an
-      # earlier "26" snapshot) doesn't have yet, unlike the actual v26 git
-      # tag. Install from git instead of `dnf install mkosi`.
+      # This repo's mkosi config relies on settings (ToolsTreeDistribution=,
+      # ToolsTreePackages=, QemuArgs=, Devicetrees=) that Fedora 44's
+      # dnf-packaged mkosi (an earlier "26" snapshot) doesn't have yet,
+      # unlike the actual v26 git tag. Install from git instead of `dnf
+      # install mkosi`.
       - name: Install mkosi
         run: |
           set -euxo pipefail
@@ -71,7 +72,7 @@ jobs:
       - name: Build qemu profile image
         run: |
           set -euxo pipefail
-          mkosi --profile=qemu -f build
+          mkosi --profile=qemu --environment=MECHA_COMMIT_SHA="${GITHUB_SHA:0:7}" -f build
           test -f mechanix-os-qemu.raw
 
       - name: Upload image artifact
@@ -85,5 +86,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: run-qemu-standalone
-          path: run-qemu-standalone.sh
+          name: run-qemu
+          path: run-qemu.sh
