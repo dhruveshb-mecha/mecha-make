@@ -8,9 +8,9 @@ This repository contains mkosi configuration and assets to build a reproducible 
 
 Configuration layout:
 
-- `mkosi.conf` - distribution, output, and boot settings.
-- `mkosi.conf.d/` - package lists, split by category (base, hardware, desktop, multimedia, mechanix apps). Merged automatically with `mkosi.conf`.
-- `mkosi.profiles/` - opt-in variants selected with `--profile=<name>`, layered on top of the default build (see "Build" below).
+- `mkosi.conf` - distribution, output, and boot settings shared by every profile.
+- `mkosi.conf.d/` - package lists, split by category (base, hardware, desktop, multimedia, mechanix apps). Merged automatically with `mkosi.conf`. Comet-specific ones (hardware, multimedia, mechanix apps) are gated with `[Match] Profiles=comet` and only apply when that profile is selected.
+- `mkosi.profiles/` - variants selected with `--profile=<name>` (or a comma-separated list, e.g. `--profile=comet,release`), layered on top of `mkosi.conf`. There's no meaningful build without picking one - see "Build" below.
 - `mkosi.version` - the image version, bumped with `mkosi bump` or `mkosi -B build` (`--auto-bump`).
 
 ## Prerequisites
@@ -52,7 +52,7 @@ screen, which greetd auto-starts as `mecha` regardless (see
 Separately, `Autologin=yes` in `mkosi.conf` is mkosi's own setting for
 passwordless **root** autologin on `tty1`/`hvc0`/nspawn's `pts/0` - i.e. an
 unauthenticated root shell on the physical/serial console. It's on by
-default for local development convenience; build with `--profile=release`
+default for local development convenience; build with the `release` profile
 (see "Build" below) to disable it.
 
 To set a password for local development or testing, create this gitignored
@@ -76,18 +76,23 @@ without `mkosi.env`.
 
 ## Build
 
-Build the image using mkosi with the provided configuration:
+There's no plain default build - always pick at least one profile (see
+"Configuration layout" above). For real Mecha Comet (arm64) hardware,
+select the `comet` profile:
 
 ```sh
-sudo mkosi -f build
+sudo mkosi --profile=comet -f build
 ```
 
-For a build with root's tty1/serial-console autologin disabled, select the
-`release` profile:
+For a build with root's tty1/serial-console autologin also disabled,
+combine it with the `release` profile:
 
 ```sh
-sudo mkosi --profile=release -f build
+sudo mkosi --profile=comet,release -f build
 ```
+
+For local x86-64 testing under QEMU instead of real hardware, see "Testing
+in QEMU" below.
 
 ## To validate the rootfs
 
@@ -111,17 +116,20 @@ Don't want to build it yourself? The `.github/workflows/qemu-image-build.yml`
 workflow builds this image and uploads it as a workflow artifact on every
 push (and via manual "Run workflow"). To grab one: open the
 [Actions tab](../../actions/workflows/qemu-image-build.yml), pick a
-successful run, and download the `mechanix-os-qemu-raw` and
-`run-qemu-standalone` artifacts from its summary page (requires being signed
-in to GitHub with access to this repo - artifacts aren't public downloads).
-Each artifact is a zip containing one file; unzip both into the same empty
-directory, then:
+successful run, and download the `mechanix-os-qemu-raw` and `run-qemu`
+artifacts from its summary page (requires being signed in to GitHub with
+access to this repo - artifacts aren't public downloads). Each artifact is
+a zip containing one file; unzip both into the same empty directory, then:
 
 ```sh
 sudo apt install -y qemu-system-x86 qemu-system-gui ovmf   # one-time host setup
-chmod +x run-qemu-standalone.sh
-./run-qemu-standalone.sh
+chmod +x run-qemu.sh
+./run-qemu.sh
 ```
+
+(`run-qemu.sh` is the same script as "Quick start" below - run standalone
+like this, with no `mkosi.conf` next to it, it detects there's no mkosi
+checkout to build from and just boots the downloaded image.)
 
 Autologin is on by default, so it boots straight to a Phosh session with no
 password needed.
