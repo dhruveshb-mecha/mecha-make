@@ -50,7 +50,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /var/cache/dnf
-          key: dnf-${{ runner.os }}-${{ hashFiles('mkosi.conf', 'mkosi.conf.d/**') }}
+          key: dnf-${{ runner.os }}-${{ hashFiles('mkosi.conf', 'mkosi.conf.d/**', 'mkosi.profiles/comet.conf') }}
           restore-keys: |
             dnf-${{ runner.os }}-
 
@@ -68,20 +68,30 @@ jobs:
             chmod 600 mkosi.env
           fi
 
-      # 5. Build image
+      # 5. Compute a single timestamp for this run, used both as the image's
+      # own IMAGE_VERSION (stamped into /etc/os-release by
+      # mkosi.postinst.chroot via $IMAGE_VERSION) and as the uploaded
+      # artifact's filename - so the two can never drift apart the way two
+      # separate `date` calls (one here, one after the build finishes) would.
+      - name: Compute build version
+        run: |
+          echo "BUILD_VERSION=$(date -u +%Y%m%d-%H%M)" >> "$GITHUB_ENV"
+          echo "COMMIT_SHA=${GITHUB_SHA:0:7}" >> "$GITHUB_ENV"
+
+      # 6. Build image
       - name: Build image with mkosi
         run: |
           set -euxo pipefail
-          mkosi -f build
+          mkosi --profile=comet --image-version="${BUILD_VERSION}" \
+            --environment=MECHA_COMMIT_SHA="${COMMIT_SHA}" -f build
           test -f "${MKOSI_OUTPUT}"
 
-      # 6. Rename image with timestamp and upload
+      # 7. Rename image and upload
       - name: Move image with timestamp
         run: |
           set -euxo pipefail
 
-          TS=$(date -u +"%Y%m%d-%H%M")
-          FINAL_NAME="mechanix-os-${TS}.raw"
+          FINAL_NAME="mechanix-os-${BUILD_VERSION}.raw"
 
           mkdir -p /opt/mecha
           mv "${MKOSI_OUTPUT}" /opt/mecha/${FINAL_NAME}
