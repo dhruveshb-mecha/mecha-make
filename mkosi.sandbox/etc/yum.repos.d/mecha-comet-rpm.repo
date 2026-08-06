@@ -4,3 +4,6 @@ baseurl=http://pkg.mecha.so/rpm
 repo_gpgcheck=0
 gpgcheck=0
 enabled=1
+# Keep in sync with mkosi.skeleton.comet-repo's copy of this file - see the
+# comment there for why priority is pinned below the default 99.
+priority=1
