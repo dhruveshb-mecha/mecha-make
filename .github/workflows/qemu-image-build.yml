@@ -1,6 +1,6 @@
 name: QEMU Test Image Build
 
-# Builds the x86-64 `qemu` profile image (phoc/phosh only, no Mechanix apps -
+# Builds the x86-64 `qemu` profile image (labwc/kanshi/wofi only, no Mechanix apps -
 # see README.md "Testing in QEMU") and uploads it as a workflow artifact, so
 # anyone with access to this repo's Actions runs can download and boot it
 # without setting up mkosi themselves.

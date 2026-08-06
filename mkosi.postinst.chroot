@@ -51,54 +51,11 @@ VARIANT_ID="${VARIANT_ID// /-}"
     echo "VARIANT_ID=\"$VARIANT_ID\""
 } >> /etc/os-release
 
-# phoc's packaged /usr/share/phosh/phoc.ini gives the "Virtual-1" output (the
-# DRM connector name paravirtualized GPUs like qemu's virtio-vga register as)
-# an arbitrary 720x1440@scale=2 placeholder. On the qemu profile, replace it
-# to match the real Comet DSI-1 panel instead: 1080x1240 physical @ scale=2,
-# i.e. the same 540x620 logical resolution phosh's UI is laid out for on
-# actual hardware. Done here (not mkosi.skeleton/mkosi.extra) because this
-# needs to run after the phosh package installs its own default file.
 if [[ " ${PROFILES:-} " == *" qemu "* ]]; then
-    cat > /usr/share/phosh/phoc.ini <<'EOF'
-#[core]
-#xwayland=false
-
-#[output:DSI-1]
-#scale = 2
-
-[output:Virtual-1]
-# Matches the real Mecha Comet DSI-1 panel's physical resolution
-# (1080x1240). scale=1 (unlike DSI-1's scale=2) since virtio-vga-gl's
-# emulated panel has nowhere near the real AMOLED's pixel density, so
-# doubling logical UI size here just makes everything look oversized.
-# No modeline: that's a legacy analog-timing concept for real video hardware
-# with fixed CRTC timings. virtio-vga-gl negotiates its resolution from the
-# host window/texture size dynamically, so forcing a custom modeline onto it
-# causes a mismatch between what phoc thinks the canvas size is and what
-# QEMU is actually presenting - visible as stretched/distorted output.
-mode = 1080x1240
-scale = 1
-
-[output:X11-1]
-mode = 360x720
-#rotate = 90
-#scale = 1
-
-[output:WL-1]
-mode = 360x720
-#rotate = 90
-#scale = 1
-
-[output:HEADLESS-1]
-mode = 720x1440
-#rotate = 90
-scale = 2
-EOF
-
     # virtio-gpu-gl's hardware cursor plane renders Y-flipped through
-    # wlroots (a known virglrenderer/wlroots interaction, not phoc-specific -
-    # same bug hits sway and other wlroots compositors under QEMU GL).
-    # Force software cursor compositing instead.
+    # wlroots (a known virglrenderer/wlroots interaction, not compositor-
+    # specific - same bug hits sway, labwc, and other wlroots compositors
+    # under QEMU GL). Force software cursor compositing instead.
     mkdir -p /etc/environment.d
     echo 'WLR_NO_HARDWARE_CURSORS=1' > /etc/environment.d/50-qemu-wlr-no-hw-cursor.conf
 fi

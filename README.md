@@ -45,7 +45,7 @@ all administrative access goes through a regular sudo user instead.
 
 That user is `mecha` (created in `mkosi.postinst.chroot`, member of `wheel`).
 No password for it is committed to this repository either - by default it
-ships locked too. This doesn't affect the Phosh session on the device
+ships locked too. This doesn't affect the labwc session on the device
 screen, which greetd auto-starts as `mecha` regardless (see
 `mkosi.skeleton/etc/greetd/config.toml`).
 
@@ -108,7 +108,7 @@ Mecha Comet hardware is arm64-only, but the `qemu` profile (`mkosi.profiles/qemu
 builds a minimal x86-64 image for local testing under QEMU: generic Fedora
 kernel instead of the Comet kernel/devicetree, and no Comet hardware or
 Mechanix app packages (neither is built for x86-64) - just the base system
-plus phoc/phosh, enough to boot to a real Phosh session.
+plus labwc/kanshi/wofi, enough to boot to a real labwc session.
 
 ### Download a prebuilt image
 
@@ -131,7 +131,7 @@ chmod +x run-qemu.sh
 like this, with no `mkosi.conf` next to it, it detects there's no mkosi
 checkout to build from and just boots the downloaded image.)
 
-Autologin is on by default, so it boots straight to a Phosh session with no
+Autologin is on by default, so it boots straight to a labwc session with no
 password needed.
 
 ### Quick start (building it yourself)
@@ -169,7 +169,7 @@ systemd-boot, exactly like real hardware would) instead of going through
   the real Comet's quad-core Cortex-A53 + 4GB LPDDR4. Everything else on the
   real SoC (the Vivante GPU, the 2.3 TOPS NPU, the camera ISP, WiFi/BT/4G
   modem, sensors, haptics, battery, security enclave) has no x86 QEMU
-  equivalent and isn't attempted - this is for verifying UI layout, phoc/phosh
+  equivalent and isn't attempted - this is for verifying UI layout, labwc/wofi
   behavior, and general app functionality, not hardware-accurate testing.
 - `-drive if=pflash,...OVMF_CODE_4M.fd` / `OVMF_VARS_4M.fd`: UEFI firmware,
   needed since the image boots via `Bootloader=systemd-boot`.
@@ -180,23 +180,24 @@ systemd-boot, exactly like real hardware would) instead of going through
   you resize the window without it staying locked to 1080x1240 physical
   pixels (which looks tiny on a normal monitor).
 - `-device qemu-xhci,id=xhci -device usb-tablet,bus=xhci.0 -device usb-kbd,bus=xhci.0`:
-  a USB controller with an absolute-position tablet (closer to touch input
-  than a relative PS/2 mouse - Phosh's UI is designed around tap-to-position)
-  plus a keyboard.
+  a USB controller with an absolute-position tablet (closer to the device's
+  touchscreen than a relative PS/2 mouse) plus a keyboard.
 
-Two more things are baked into the image itself for the `qemu` profile (see
-`mkosi.postinst.chroot`, gated on `$PROFILES` so they never affect the real
+One more thing is baked into the image itself for the `qemu` profile (see
+`mkosi.postinst.chroot`, gated on `$PROFILES` so it never affects the real
 Comet build):
 
-- **Display geometry**: phosh's packaged `/usr/share/phosh/phoc.ini` gives
-  the `Virtual-1` output (the DRM connector name paravirtualized GPUs like
-  `virtio-vga` register as) an arbitrary `720x1440@scale=2` placeholder.
-  It's replaced with `1080x1240@scale=1` to match the real DSI-1 panel's
-  resolution.
 - **Cursor fix**: `virtio-gpu-gl`'s hardware cursor plane renders Y-flipped
   through wlroots (the same bug hits other wlroots compositors, e.g. sway,
-  under QEMU GL - not phoc-specific). `WLR_NO_HARDWARE_CURSORS=1` is set via
+  under QEMU GL - not labwc-specific). `WLR_NO_HARDWARE_CURSORS=1` is set via
   `/etc/environment.d/` to force software cursor compositing instead.
+
+Output scaling (`scale=2`) is handled uniformly for both profiles by kanshi
+(`mkosi.skeleton/etc/xdg/kanshi/config`, autostarted from
+`mkosi.skeleton/etc/xdg/labwc/autostart`) rather than a qemu-specific
+override, so the `qemu` profile's virtual display now renders at the same
+scale as the real Comet DSI panel - it'll look larger in the QEMU window
+than the old phoc-based `Virtual-1@scale=1` override did.
 
 ### Multitouch and other input limits
 
