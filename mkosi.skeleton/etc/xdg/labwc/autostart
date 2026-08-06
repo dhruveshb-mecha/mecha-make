@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# kanshi only reads $XDG_CONFIG_HOME/kanshi/config by default (no /etc/xdg
+# fallback of its own, unlike labwc) - point it at the system-wide one
+# explicitly. See /etc/xdg/kanshi/config for the scale=2 output profile.
+kanshi -c /etc/xdg/kanshi/config >/dev/null 2>&1 &

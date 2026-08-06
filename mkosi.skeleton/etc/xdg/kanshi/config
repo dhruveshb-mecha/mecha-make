@@ -1,0 +1,5 @@
+# Matches any connected output - the real Comet DSI panel, or QEMU's
+# virtual display under the qemu profile. See kanshi(5).
+profile {
+	output "*" scale 2
+}

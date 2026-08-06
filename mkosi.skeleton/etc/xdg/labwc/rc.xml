@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<labwc_config>
+
+  <keyboard>
+    <default />
+    <!-- alacritty is this image's terminal (mkosi.conf.d/20-packages-desktop.conf) -->
+    <keybind key="W-Return">
+      <action name="Execute" command="alacritty" />
+    </keybind>
+    <!-- app launcher -->
+    <keybind key="W-space">
+      <action name="Execute" command="wofi --show drun" />
+    </keybind>
+  </keyboard>
+
+  <mouse>
+    <default />
+  </mouse>
+
+</labwc_config>
