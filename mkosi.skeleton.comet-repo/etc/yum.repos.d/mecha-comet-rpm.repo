@@ -4,3 +4,14 @@ baseurl=http://pkg.mecha.so/rpm
 repo_gpgcheck=0
 gpgcheck=0
 enabled=1
+# Fedora's own fedora/updates repos (priority=99, the dnf5 default) also
+# carry kernel-core/kernel-modules* etc. under stock package names, at a
+# numerically higher EVR than our custom-built ones (see
+# mkosi.conf.d/10-packages-hardware.conf) - `dnf upgrade` would otherwise
+# pick those over ours, replacing the Comet-specific kernel with a generic
+# one that has no imx8mp devicetree/board support and leaves the device
+# unbootable. dnf5's `priority` is compared before package version - the
+# repo with the lowest value always wins regardless of EVR - so pinning this
+# below 99 keeps every package this repo provides (kernel included) sourced
+# from here, only upgrading when this repo itself has a newer build.
+priority=1
