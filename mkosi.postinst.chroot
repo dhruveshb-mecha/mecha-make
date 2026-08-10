@@ -24,6 +24,11 @@ install -d -o "$USERNAME" -g "$USERNAME" "/home/$USERNAME/.config/wofi"
 install -o "$USERNAME" -g "$USERNAME" -m 0644 \
     /etc/xdg/wofi/style.css "/home/$USERNAME/.config/wofi/style.css"
 
+# alacritty reads ~/.config/alacritty
+install -d -o "$USERNAME" -g "$USERNAME" "/home/$USERNAME/.config/alacritty"
+install -o "$USERNAME" -g "$USERNAME" -m 0644 \
+    /etc/xdg/alacritty/alacritty.toml "/home/$USERNAME/.config/alacritty/alacritty.toml"
+
 glib-compile-schemas /usr/share/glib-2.0/schemas/
 
 # Set the default timezone for the built image.
