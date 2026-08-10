@@ -16,7 +16,7 @@ jobs:
       options: --privileged
 
     env:
-      MKOSI_OUTPUT: mechanix-os.raw
+      MKOSI_OUTPUT: mechanix-os.raw.zst
       IMAGE_PREFIX: mechanix-os
 
     steps:
@@ -91,7 +91,7 @@ jobs:
         run: |
           set -euxo pipefail
 
-          FINAL_NAME="mechanix-os-${BUILD_VERSION}.raw"
+          FINAL_NAME="mechanix-os-${BUILD_VERSION}.raw.zst"
 
           mkdir -p /opt/mecha
           mv "${MKOSI_OUTPUT}" /opt/mecha/${FINAL_NAME}
@@ -103,3 +103,4 @@ jobs:
         with:
           name: ${{ env.IMAGE_NAME }}
           path: /opt/mecha/${{ env.IMAGE_NAME }}
+          compression-level: 0
