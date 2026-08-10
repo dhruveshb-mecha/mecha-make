@@ -11,6 +11,12 @@
     <keybind key="W-space">
       <action name="Execute" command="wofi --show drun" />
     </keybind>
+    <!-- device power button (KEY_POWER -> XF86PowerOff); logind ignores this
+         key (see /etc/systemd/logind.conf) so it reaches labwc instead of
+         triggering a shutdown -->
+    <keybind key="XF86PowerOff">
+      <action name="Execute" command="wofi --show drun" />
+    </keybind>
   </keyboard>
 
   <mouse>
