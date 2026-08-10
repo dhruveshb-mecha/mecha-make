@@ -1,0 +1,42 @@
+/* Container window spanning 100% width */
+window {
+    font-family: "Inter", "Segoe UI", sans-serif;
+    font-size: 14px;
+    background-color: #1e1e2e; /* Dark theme background */
+    color: #cdd6f4;
+}
+
+/* Outer layout wrapper */
+#outer-box {
+    margin: 10px;
+    padding: 5px;
+}
+
+/* Search input field */
+#input {
+    margin: 5px;
+    padding: 8px;
+    background-color: #313244;
+    border: 1px solid #45475a;
+    border-radius: 6px;
+    color: #cdd6f4;
+}
+
+/* Individual list item entry */
+#entry {
+    padding: 10px;
+    border-radius: 6px;
+}
+
+/* entry state when hovered or arrowed over */
+#entry:selected {
+    background-color: #89b4fa; /* Accent color */
+    color: #11111b;
+}
+
+/* Explicitly target and scale icons */
+#img {
+    margin-right: 12px;
+    width: 24px;
+    height: 24px;
+}

@@ -1,0 +1,11 @@
+# Display modes
+show=drun
+allow_images=true
+
+# Layout geometry
+width=80%
+height=300
+location=center
+
+# Hide search bar border/header for a cleaner look
+no_actions=true
