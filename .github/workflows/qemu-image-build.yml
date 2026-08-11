@@ -1,9 +1,6 @@
-name: QEMU Test Image Build
+name: QEMU Image Build
 
-# Builds the x86-64 `qemu` profile image (phoc/phosh only, no Mechanix apps -
-# see README.md "Testing in QEMU") and uploads it as a workflow artifact, so
-# anyone with access to this repo's Actions runs can download and boot it
-# without setting up mkosi themselves.
+# Builds the x86-64 `qemu` profile
 on:
   push:
   workflow_dispatch:
@@ -11,11 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    # Same base as mkosi-image-build.yml: building this profile's Fedora
-    # tools tree (mkosi.conf's [Build] section) needs a working dnf/rpm
-    # somewhere to bootstrap from, which a plain ubuntu-latest runner has
-    # neither of.
+   
     container:
       image: fedora:44
       options: --privileged
@@ -43,20 +36,13 @@ jobs:
             distribution-gpg-keys \
             fedora-repos
 
-      # This repo's mkosi config relies on settings (ToolsTreeDistribution=,
-      # ToolsTreePackages=, QemuArgs=, Devicetrees=) that Fedora 44's
-      # dnf-packaged mkosi (an earlier "26" snapshot) doesn't have yet,
-      # unlike the actual v26 git tag. Install from git instead of `dnf
-      # install mkosi`.
       - name: Install mkosi
         run: |
           set -euxo pipefail
           pipx install git+https://github.com/systemd/mkosi.git
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
-      # Configure the mecha user's password from a repo secret (never
-      # committed to git). Root has no password mechanism at all - see
-      # mkosi.conf. If CI_MECHA_USER_PASSWORD isn't configured, the build
+      # Configure the mecha user's password from a repo secret. If CI_MECHA_USER_PASSWORD isn't configured, the build
       # falls back to the secure default: the mecha user ships locked.
       
       - name: Configure CI credentials
