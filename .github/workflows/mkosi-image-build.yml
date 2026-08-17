@@ -1,4 +1,4 @@
-name: Mechanix OS mkosi Image Build
+name: Mechanix OS Image Build
 
 on:
   push:
@@ -45,7 +45,7 @@ jobs:
             xz \
             tar
 
-      # 3. Cache DNF packages
+      # 3. Cache DNF packages for the tool-install step below.
       - name: Cache DNF
         uses: actions/cache@v4
         with:
@@ -54,9 +54,16 @@ jobs:
           restore-keys: |
             dnf-${{ runner.os }}-
 
-      # 4. Configure the mecha user's password from a repo secret (never
-      # committed to git). Root has no password mechanism at all - see
-      # mkosi.conf. If CI_MECHA_USER_PASSWORD isn't configured, the build
+      # Cache the RPMs mkosi's dnf downloads (PackageCacheDirectory=mkosi.pkgcache).
+      - name: Cache mkosi RPMs
+        uses: actions/cache@v4
+        with:
+          path: mkosi.pkgcache
+          key: mkosi-pkg-${{ runner.os }}-${{ hashFiles('mkosi.conf', 'mkosi.conf.d/**', 'mkosi.profiles/comet.conf') }}
+          restore-keys: |
+            mkosi-pkg-${{ runner.os }}-
+
+      # 4. Configure the mecha user's password from a repo secret If CI_MECHA_USER_PASSWORD isn't configured, the build
       # falls back to the secure default: the mecha user ships locked.
       - name: Configure CI credentials
         env:
@@ -68,11 +75,8 @@ jobs:
             chmod 600 mkosi.env
           fi
 
-      # 5. Compute a single timestamp for this run, used both as the image's
-      # own IMAGE_VERSION (stamped into /etc/os-release by
-      # mkosi.postinst.chroot via $IMAGE_VERSION) and as the uploaded
-      # artifact's filename - so the two can never drift apart the way two
-      # separate `date` calls (one here, one after the build finishes) would.
+      # 5. Compute a single timestamp for this run, used as the image's
+      # own IMAGE_VERSION (stamped into /etc/os-release)
       - name: Compute build version
         run: |
           echo "BUILD_VERSION=$(date -u +%Y%m%d-%H%M)" >> "$GITHUB_ENV"
