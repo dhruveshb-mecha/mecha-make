@@ -5,6 +5,12 @@
 export XDG_RUNTIME_DIR="/run/user/$(id -u)"
 mkdir -p "$XDG_RUNTIME_DIR" 2>/dev/null || true
 
+export HOME="/home/mecha"
+export XDG_CACHE_HOME="$HOME/.cache"
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+mkdir -p "$XDG_CACHE_HOME" "$XDG_DATA_HOME" 2>/dev/null || true
+
 unset WAYLAND_DISPLAY DISPLAY
 
 # DSI panel is imx-lcdif card2; the primary GPU (etnaviv) has no modeset.
@@ -23,11 +29,10 @@ launch_defaults() {
     sleep 0.2
 
     # Drawer resident for the waybar toggle; -close only once the window exists.
-    rm -f "${XDG_DATA_HOME:-$HOME/.local/share}/nwg-drawer.lock"
+    rm -f "${XDG_DATA_HOME}/nwg-drawer.lock"
     nwg-drawer -r -k -nocats -nofs -c 3 -is 48 -spacing 12 >/tmp/nwg-drawer.log 2>&1 &
     waybar >/tmp/waybar.log 2>&1 &
     squeekboard >/tmp/squeekboard.log 2>&1 &
-    (sleep 4 && nwg-drawer -close) >/dev/null 2>&1 &
 }
 
 while true; do
