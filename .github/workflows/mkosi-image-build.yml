@@ -87,8 +87,31 @@ jobs:
         run: |
           set -euxo pipefail
           mkosi --profile=comet --image-version="${BUILD_VERSION}" \
-            --environment=MECHA_COMMIT_SHA="${COMMIT_SHA}" -f build
+            --environment=MECHA_COMMIT_SHA="${COMMIT_SHA}" \
+            --debug --debug-workspace \
+            -f build 2>&1 | tee mkosi-build.log
           test -f "${MKOSI_OUTPUT}"
+
+      # 6b. dnf5.log has the real rpm error; the console log doesn't because
+      # GH Actions collapses \r-based progress redraws before storing it.
+      - name: Collect build logs
+        if: always()
+        run: |
+          set -x
+          mkdir -p ci-logs
+          cp mkosi-build.log ci-logs/ 2>/dev/null || true
+          find / -xdev -path /proc -prune -o -name 'dnf5.log*' -print 2>/dev/null \
+            | while read -r f; do cp --parents "$f" ci-logs/ 2>/dev/null || true; done
+        continue-on-error: true
+
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mkosi-build-logs-${{ github.run_id }}
+          path: ci-logs/
+          if-no-files-found: warn
+          retention-days: 7
 
       # 7. Rename image and upload
       - name: Move image with timestamp
