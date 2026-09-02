@@ -1,60 +1,26 @@
 #!/bin/bash
-# Session: compositor loop + waybar, nwg-drawer, squeekboard.
-# pkill -x compositor hot-reloads.
-
-export XDG_RUNTIME_DIR="/run/user/$(id -u)"
-mkdir -p "$XDG_RUNTIME_DIR" 2>/dev/null || true
-
-export HOME="/home/mecha"
-export XDG_CACHE_HOME="$HOME/.cache"
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_DATA_HOME="$HOME/.local/share"
-mkdir -p "$XDG_CACHE_HOME" "$XDG_DATA_HOME" 2>/dev/null || true
-
-unset WAYLAND_DISPLAY DISPLAY
+# Session: compositor + waybar, nwg-drawer, mechanix-keyboard.
 
 # DSI panel is imx-lcdif card2; the primary GPU (etnaviv) has no modeset.
 export MECHA_DRM_DEVICE=/dev/dri/card2
 
-export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+/usr/local/bin/compositor > /tmp/compositor.log 2>&1 &
+COMPOSITOR_PID=$!
 
-# seatd wins over logind when running under it.
-[ -S /run/seatd.sock ] && export LIBSEAT_BACKEND=seatd
+WAYLAND_DISPLAY=""
+for i in $(seq 1 150); do
+    sock=$(ls -d "$XDG_RUNTIME_DIR"/wayland-* 2>/dev/null | grep -v '\.lock$' | head -1 || true)
+    if [ -n "$sock" ]; then WAYLAND_DISPLAY=$(basename "$sock"); break; fi
+    sleep 0.1
+done
 
-launch_defaults() {
-    pkill -x waybar 2>/dev/null || true
-    pkill -x nwg-drawer 2>/dev/null || true
-    pkill -x squeekboard 2>/dev/null || true
-    pkill -x nwg-bar 2>/dev/null || true
-    sleep 0.2
+if [ -n "$WAYLAND_DISPLAY" ]; then
+    export WAYLAND_DISPLAY
 
-    # Drawer resident for the waybar toggle; -close only once the window exists.
-    rm -f "${XDG_DATA_HOME}/nwg-drawer.lock"
+    rm -f "${XDG_DATA_HOME:-$HOME/.local/share}/nwg-drawer.lock"
     nwg-drawer -r -k -nocats -nofs -c 3 -is 48 -spacing 12 >/tmp/nwg-drawer.log 2>&1 &
     waybar >/tmp/waybar.log 2>&1 &
-    squeekboard >/tmp/squeekboard.log 2>&1 &
-}
+    mechanix-keyboard >/tmp/mechanix-keyboard.log 2>&1 &
+fi
 
-while true; do
-    unset WAYLAND_DISPLAY DISPLAY
-    rm -f "$XDG_RUNTIME_DIR"/wayland-* 2>/dev/null || true
-
-    /usr/bin/mechanix-compositor > /tmp/compositor.log 2>&1 &
-    COMPOSITOR_PID=$!
-
-    WAYLAND_DISPLAY=""
-    for i in $(seq 1 150); do
-        sock=$(ls -d "$XDG_RUNTIME_DIR"/wayland-* 2>/dev/null | grep -v '\.lock$' | head -1 || true)
-        if [ -n "$sock" ]; then WAYLAND_DISPLAY=$(basename "$sock"); break; fi
-        sleep 0.1
-    done
-
-    if [ -n "$WAYLAND_DISPLAY" ]; then
-        export WAYLAND_DISPLAY
-        launch_defaults
-    fi
-
-    wait "$COMPOSITOR_PID"
-    echo "compositor exited rc=$? at $(date +%H:%M:%S) socket='$WAYLAND_DISPLAY'" >> /tmp/compositor-exit.log
-    sleep 2
-done
+wait "$COMPOSITOR_PID"
