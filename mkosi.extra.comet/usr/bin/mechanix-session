@@ -4,7 +4,7 @@
 # DSI panel is imx-lcdif card2; the primary GPU (etnaviv) has no modeset.
 export MECHA_DRM_DEVICE=/dev/dri/card2
 
-/usr/local/bin/compositor > /tmp/compositor.log 2>&1 &
+/usr/bin/mechanix-compositor > /tmp/compositor.log 2>&1 &
 COMPOSITOR_PID=$!
 
 WAYLAND_DISPLAY=""
