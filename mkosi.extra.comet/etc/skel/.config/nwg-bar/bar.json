@@ -1,7 +1,7 @@
 [
     {
         "label": "Lock",
-        "exec": "wlopm --off DSI-1",
+        "exec": "mechanix-lock",
         "icon": "/usr/share/nwg-bar/images/system-lock-screen.svg"
     },
     {
